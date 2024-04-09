@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <nav>
+    <nav id="navigation-bar">
       <ul>
         <li>
           <router-link to="/">Home</router-link>
         </li>
         <li>
-          <router-link to="/produce">制作答题卡</router-link>
+          <router-link to="/produce_overview">制作答题卡</router-link>
         </li>
         <li>
           <router-link to="/grade">批改</router-link>
@@ -19,30 +19,20 @@
     <div id="router-view-container">
       <router-view/>
     </div>
-
   </div>
 </template>
 
-<script>
-import {ref} from 'vue'
+<script setup>
+import {ref, onMounted} from 'vue'
 
-export default {
-  setup() {
-    const user_state = ref('登录/注册');
-    return {
-      user_state
-    }
-  },
+const user_state = ref('登录/注册');
 
-  name: 'App'
-}
 </script>
 
 <style>
 #app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
 nav {
@@ -73,9 +63,12 @@ nav li {
   text-decoration: none;
 }
 
-#router-view-container {
-  padding-left: 50px;
-  padding-right: 50px;
+html, body {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 100%;
 }
 
 </style>

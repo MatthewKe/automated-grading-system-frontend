@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "v3-drag-zoom": "^1.1.18",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
