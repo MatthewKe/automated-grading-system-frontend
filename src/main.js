@@ -6,9 +6,10 @@ import Grade from "@/components/Grade.vue";
 import {createRouter, createWebHashHistory} from 'vue-router'
 import User from "@/components/User.vue";
 import Produce from "@/components/Produce.vue";
-import V3DragZoom from "v3-drag-zoom";
-import "v3-drag-zoom/dist/style.css";
-
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import V3DragZoom from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
+import "@/components/v3-drag-zoom/dist/style.css";
 
 const routes = [
     {path: '/', component: Home},
@@ -24,7 +25,8 @@ const router = createRouter({
 })
 
 const app = createApp(App)
-app.use(router)
+app.use(ElementPlus)
 app.use(V3DragZoom)
+app.use(router)
 app.mount('#app')
 

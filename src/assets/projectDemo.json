@@ -1,0 +1,34 @@
+{
+  "numOfSheets": 2,
+  "sheets": [
+    {
+      "numOfAnswerAreaContainers": 3
+    },
+    {
+      "numOfAnswerAreaContainers": 2
+    }
+  ],
+  "numOfAnswerAreas": 5,
+  "answerAreas": [
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    }
+  ]
+}
