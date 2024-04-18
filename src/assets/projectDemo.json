@@ -1,5 +1,8 @@
 {
+  "title": "答题卡(点我修改)珠海一中第一次联考理科",
   "numOfSheets": 2,
+  "sizeOfSheet": "A3",
+  "sheetsPadding": 3,
   "sheets": [
     {
       "numOfAnswerAreaContainers": 3
@@ -8,8 +11,30 @@
       "numOfAnswerAreaContainers": 2
     }
   ],
-  "numOfAnswerAreas": 5,
+  "answerAreaContainerPadding": 3,
+  "gapBetweenAnswerArea": 3,
+  "numOfAnswerAreas": 10,
   "answerAreas": [
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
+    {
+      "type": "blankAnswerArea",
+      "height": 30
+    },
     {
       "type": "blankAnswerArea",
       "height": 30

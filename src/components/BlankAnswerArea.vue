@@ -1,4 +1,6 @@
 <script setup>
+import {computed} from "vue";
+
 const props = defineProps({
   width: Number,
   height: Number
@@ -35,6 +37,15 @@ function endDrag(event) {
 
 <style scoped>
 canvas {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: block;
   border: 2px solid #000000;
+}
+
+.draggable {
+  margin: 0;
+  padding: 0;
 }
 </style>

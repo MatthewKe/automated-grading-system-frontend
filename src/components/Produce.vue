@@ -2,7 +2,7 @@
 
 import PreSet from "@/components/PreSet.vue";
 import componentDetails from "@/components/ComponentDetails.vue";
-import BlueprintArea from "@/components/Plotter.vue";
+import plotter from "@/components/Plotter.vue";
 import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 
 
@@ -15,11 +15,9 @@ const componentDetailsWidth = 233
   <div id="container" :style="{height: containerHeight+'px'}">
     <pre-set :pre-set-width="preSetWidth"></pre-set>
     <div class="resizer" @mousedown="startResize(0)"></div>
-    <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0">
-      <blueprint-area style="flex-grow: 1; flex-basis: 0;"></blueprint-area>
+    <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0" align="auto">
+      <plotter style="flex:0 0 auto;"></plotter>
     </v3-drag-zoom-container>
-    <!--    <div class="resizer" @mousedown="startResize(1)"></div>-->
-    <!--    <component-details :componentDetailsWidth="componentDetailsWidth"></component-details>-->
   </div>
 </template>
 
