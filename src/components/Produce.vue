@@ -15,7 +15,7 @@ const componentDetailsWidth = 233
   <div id="container" :style="{height: containerHeight+'px'}">
     <pre-set :pre-set-width="preSetWidth"></pre-set>
     <div class="resizer" @mousedown="startResize(0)"></div>
-    <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0" align="auto">
+    <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0">
       <plotter style="flex:0 0 auto;"></plotter>
     </v3-drag-zoom-container>
   </div>

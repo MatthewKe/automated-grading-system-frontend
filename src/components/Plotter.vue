@@ -1,70 +1,27 @@
 <script setup>
-import {computed, createApp, onMounted, ref} from 'vue'
+import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
 import BlankAnswerArea from "@/components/BlankAnswerArea.vue";
 
-const projectConfigJson = "{\n" +
-    "  \"title\": \"答题卡(点我修改)珠海一中第一次联考理科\",\n" +
-    "  \"numOfSheets\": 2,\n" +
-    "  \"sizeOfSheet\": \"A3\",\n" +
-    "  \"sheetsPadding\": 14,\n" +
-    "  \"heightOfInfoArea\": 25,\n" +
-    "  \"sheets\": [\n" +
-    "    {\n" +
-    "      \"numOfAnswerAreaContainers\": 3\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"numOfAnswerAreaContainers\": 2\n" +
-    "    }\n" +
-    "  ],\n" +
-    "  \"gapBetweenAnswerAreaContainer\": 3,\n" +
-    "  \"answerAreaContainerPadding\": 3,\n" +
-    "  \"gapBetweenAnswerArea\": 3,\n" +
-    "  \"numOfAnswerAreas\": 10,\n" +
-    "  \"answerAreas\": [\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    },\n" +
-    "    {\n" +
-    "      \"type\": \"blankAnswerArea\",\n" +
-    "      \"height\": 30\n" +
-    "    }\n" +
-    "  ]\n" +
-    "}"
+let projectConfigJson = ref('{}')
 
-const projectConfig = ref(JSON.parse(projectConfigJson))
+const projectConfig = ref({})
+
+watchEffect(() => {
+  projectConfig.value = JSON.parse(projectConfigJson.value)
+})
+
+fetch('http://localhost:3000/read-file')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+      projectConfigJson.value = data
+    })
+    .catch(error => console.error('There has been a problem with your fetch operation:', error));
+
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -75,27 +32,26 @@ const dpi = 96
 const mmToInch = 25.4
 const pixelPerMm = dpi / mmToInch
 
-
 const sheetsPaddingPx = computed(() => projectConfig.value.sheetsPadding * pixelPerMm)
 
 const widthOfSheetPx = computed(() => {
   if (projectConfig.value.sizeOfSheet === 'A3') {
-    return sizes.A3.width * pixelPerMm - sheetsPaddingPx.value
+    return sizes.A3.width * pixelPerMm - sheetsPaddingPx.value * 2
   }
   if (projectConfig.value.sizeOfSheet === 'A4') {
-    return sizes.A4.width * pixelPerMm - sheetsPaddingPx.value
+    return sizes.A4.width * pixelPerMm - sheetsPaddingPx.value * 2
   }
-  return sizes.A3.width * pixelPerMm - sheetsPaddingPx.value
+  return sizes.A3.width * pixelPerMm - sheetsPaddingPx.value * 2
 })
 
 const heightOfSheetPx = computed(() => {
       if (projectConfig.value.sizeOfSheet === 'A3') {
-        return sizes.A3.height * pixelPerMm - sheetsPaddingPx.value
+        return sizes.A3.height * pixelPerMm - sheetsPaddingPx.value * 2
       }
       if (projectConfig.value.sizeOfSheet === 'A4') {
-        return sizes.A4.height * pixelPerMm - sheetsPaddingPx.value
+        return sizes.A4.height * pixelPerMm - sheetsPaddingPx.value * 2
       }
-      return sizes.A3.height * pixelPerMm - sheetsPaddingPx.value
+      return sizes.A3.height * pixelPerMm - sheetsPaddingPx.value * 2
     }
 )
 
@@ -105,7 +61,7 @@ const borderOfAnswerAreaContainerPx = 2.4
 
 const heightOfAnswerAreaContainerPx = computed(() => heightOfSheetPx.value - 2 * answerAreaContainerPaddingPx.value - 2 * borderOfAnswerAreaContainerPx)
 
-const heightOfInfoAreaPx = computed(() => projectConfig.value.heightOfInfoArea * pixelPerMm)
+const sizeOfInfoAreaPx = computed(() => projectConfig.value.heightOfInfoArea * pixelPerMm)
 
 const title = computed(() => projectConfig.value.title)
 
@@ -116,18 +72,22 @@ const gapBetweenAnswerAreaContainerPx = computed(() => projectConfig.value.gapBe
 const gapBetweenAnswerAreaPx = computed(() => projectConfig.value.gapBetweenAnswerArea * pixelPerMm)
 
 const infoAreaStyle = computed(() => ({
-      maxHeight: `${heightOfInfoAreaPx.value}px`,
-      minHeight: `${heightOfInfoAreaPx.value}px`
+      maxHeight: `${sizeOfInfoAreaPx.value}px`,
+      minHeight: `${sizeOfInfoAreaPx.value}px`
     })
 )
 
 const barcodeStyle = computed(() => ({
-  minWidth: `${heightOfInfoAreaPx.value}px`,
-  maxWidth: `${heightOfInfoAreaPx.value}px`,
-  flexBasis: `${heightOfInfoAreaPx.value}px`
+  maxHeight: `${sizeOfInfoAreaPx.value}px`,
+  minHeight: `${sizeOfInfoAreaPx.value}px`,
+  minWidth: `${sizeOfInfoAreaPx.value}px`,
+  maxWidth: `${sizeOfInfoAreaPx.value}px`,
+  flexBasis: `${sizeOfInfoAreaPx.value}px`
 }))
 
-const renderInfo = computed(() => {
+const answerAreaContainers = computed(() => updateAnswerAreaContainers())
+
+function updateAnswerAreaContainers() {
   //生成answerAreaContainers，并且预装info-area
   let answerAreaContainers = []
   let numOfSheets = projectConfig.value.numOfSheets
@@ -145,11 +105,11 @@ const renderInfo = computed(() => {
   }
 
   let answerAreas = projectConfig.value.answerAreas
-  
+
   //计算填充answerAreaContainers
   let i = 0
   let j = 0
-  let heightLeftPx = heightOfAnswerAreaContainerPx.value - heightOfInfoAreaPx.value
+  let heightLeftPx = heightOfAnswerAreaContainerPx.value - sizeOfInfoAreaPx.value
 
   for (let answerArea of answerAreas) {
     let answerAreaHeightPx = answerArea.height * pixelPerMm
@@ -160,10 +120,15 @@ const renderInfo = computed(() => {
     if (j >= sheets.value[i].numOfAnswerAreaContainers) {
       i++
       j = 0
-      heightLeftPx = heightLeftPx - heightOfInfoAreaPx.value
+      heightLeftPx = heightLeftPx - sizeOfInfoAreaPx.value
     }
     if (i >= projectConfig.value.numOfSheets) {
       //需要新增一个sheet
+      projectConfig.value.sheets.push({
+        "numOfAnswerAreaContainers": 3
+      })
+      projectConfig.value.numOfSheets++
+      return answerAreaContainers
     }
 
     let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[i].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[i].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
@@ -176,18 +141,17 @@ const renderInfo = computed(() => {
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
   console.log(answerAreaContainers)
-  return {
-    answerAreaContainers: answerAreaContainers,
+  return answerAreaContainers
+}
+
+watch(() => projectConfig.value.numOfSheets, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    updateAnswerAreaContainers();
   }
-})
-
-onMounted(() => {
-
-})
+});
 
 
 function handleDrop(event) {
-  console.log(event)
   let type = event.dataTransfer.getData('text/plain')
   if (type === 'blankAnswerArea') {
     const newReplyArea = document.createElement('div')
@@ -205,7 +169,8 @@ function handleDrop(event) {
          , gap:gapBetweenAnswerAreaContainerPx+'px'}">
       <div v-for="j in sheet.numOfAnswerAreaContainers" :key="j" class="answerAreaContainer"
            :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}">
-        <div v-for="(answerArea,k) in renderInfo.answerAreaContainers[i][j-1]" :key="k">
+        <div v-if="answerAreaContainers[i]&&answerAreaContainers[i][j-1]"
+             v-for="(answerArea,k) in answerAreaContainers[i][j-1]" :key="k">
           <div v-if="answerArea.type==='infoArea'" class="info-area" :style="infoAreaStyle">
             <div class="barcode" :style="barcodeStyle"></div>
             <div class="title">
