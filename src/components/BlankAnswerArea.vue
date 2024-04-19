@@ -1,26 +1,30 @@
 <script setup>
-import {computed} from "vue";
+import {onMounted} from "vue";
 
 const props = defineProps({
   width: Number,
-  height: Number
+  height: Number,
+  areaId: Number
 })
 
 function startDrag(event) {
-  event.dataTransfer.setData("text/plain", "blankReplyArea")
-  console.log(event)
+  event.dataTransfer.setData("text/plain", props.areaId)
 }
 
 function endDrag(event) {
   event.preventDefault()
-  // event.target 指向触发事件的元素
-  const callerElement = event.target;
-
-  // 如果存在父元素，从DOM中移除元素
-  if (callerElement.parentNode.parentNode) {
-    callerElement.parentNode.parentNode.removeChild(callerElement.parentNode);
-  }
 }
+
+onMounted(() => {
+  const canvas = document.getElementById(props.areaId).getElementsByTagName('canvas')[0]
+  const ctx = canvas.getContext('2d')
+  ctx.font = '24px Arial'; // 设置字体大小和类型
+  ctx.fillStyle = 'red';   // 设置字体颜色
+  ctx.textAlign = 'center';// 设置文字对齐方式，可选 'left', 'right', 'center', 'start', 'end'
+// 写字
+  ctx.fillText(props.areaId, canvas.width / 2, canvas.height / 2)
+})
+
 
 </script>
 
@@ -31,7 +35,7 @@ function endDrag(event) {
       @dragstart="startDrag"
       @dragend="endDrag"
   >
-    <canvas :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
+    <canvas id="canvas" :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
   </div>
 </template>
 

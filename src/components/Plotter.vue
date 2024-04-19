@@ -7,7 +7,16 @@ let projectConfigJson = ref('{}')
 const projectConfig = ref({})
 
 watchEffect(() => {
+  console.log('watchEffect')
   projectConfig.value = JSON.parse(projectConfigJson.value)
+  for (let i = 1; i < 10; i++) {
+    projectConfig.value.answerAreas?.push({
+      "id": i,
+      "type": "blankAnswerArea",
+      "height": 30
+    })
+  }
+  console.log(projectConfig.value.answerAreas)
 })
 
 fetch('http://localhost:3000/read-file')
@@ -85,7 +94,13 @@ const barcodeStyle = computed(() => ({
   flexBasis: `${sizeOfInfoAreaPx.value}px`
 }))
 
-const answerAreaContainers = computed(() => updateAnswerAreaContainers())
+
+const answerAreaContainers = computed(() => {
+  console.log('answerAreaContainers computed')
+
+  console.log(updateAnswerAreaContainers())
+  return updateAnswerAreaContainers()
+})
 
 function updateAnswerAreaContainers() {
   //生成answerAreaContainers，并且预装info-area
@@ -134,30 +149,71 @@ function updateAnswerAreaContainers() {
     let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[i].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[i].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
     answerAreaContainers[i][j].push(
         {
+          id: answerArea.id,
           type: answerArea.type,
           height: answerAreaHeightPx,
           width: answerAreaWidthPx
         })
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
-  console.log(answerAreaContainers)
   return answerAreaContainers
 }
 
-watch(() => projectConfig.value.numOfSheets, (newVal, oldVal) => {
-  if (newVal !== oldVal) {
-    updateAnswerAreaContainers();
-  }
-});
+// watch(() => projectConfig.value.numOfSheets, (newVal, oldVal) => {
+//   if (newVal !== oldVal) {
+//     updateAnswerAreaContainers();
+//   }
+// });
 
 
 function handleDrop(event) {
-  let type = event.dataTransfer.getData('text/plain')
-  if (type === 'blankAnswerArea') {
-    const newReplyArea = document.createElement('div')
-    event.target.append(newReplyArea)
-    createApp(BlankAnswerArea).mount(newReplyArea)
+  event.preventDefault();
+  const id = event.dataTransfer.getData('text/plain')
+  const answerAreaContainer = event.currentTarget
+  const y = event.clientY - answerAreaContainer.getBoundingClientRect().top
+  const answerAreaArr = answerAreaContainer.children
+  let idOfSubsequentAnswerArea = null
+  let idOfPreAnswerArea = null
+  for (const answerArea of answerAreaArr) {
+    let answerAreaY = answerArea.getBoundingClientRect().top - answerAreaContainer.getBoundingClientRect().top
+    let answerAreaHeight = answerArea.getBoundingClientRect().height
+    if (y < answerAreaY + answerAreaHeight / 2) {
+      idOfSubsequentAnswerArea = answerArea.id
+      break
+    } else {
+      idOfPreAnswerArea = answerArea.id
+    }
   }
+  reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
+  console.log('idOfSubsequentAnswerArea' + idOfSubsequentAnswerArea)
+  console.log('idOfPreAnswerArea' + idOfPreAnswerArea)
+  console.log('indexOfAnswerArea:' + id)
+}
+
+function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnswerArea) {
+  let answerAreaArr = projectConfig.value.answerAreas
+  let indexOfAnswerArea = answerAreaArr.findIndex((e) => {
+        return e.id === idOfAnswerArea
+      }
+  )
+  let answerArea = answerAreaArr[indexOfAnswerArea]
+  answerAreaArr.splice(indexOfAnswerArea, 1)
+  if (idOfPreAnswerArea !== null) {
+    console.log()
+    let indexOfPreAnswerArea = answerAreaArr.findIndex(
+        (e) => e.id === idOfPreAnswerArea
+    )
+    console.log('indexOfPreAnswerArea:' + indexOfPreAnswerArea)
+    answerAreaArr.splice(indexOfPreAnswerArea + 1, 0, answerArea)
+  } else if (idOfSubsequentAnswerArea !== null) {
+    let indexOfSubsequentAnswerArea = answerAreaArr.findIndex(
+        (e) => e.id === idOfSubsequentAnswerArea
+    )
+    answerAreaArr.splice(indexOfSubsequentAnswerArea, 0, answerArea)
+  }
+  projectConfig.value.answerAreas = answerAreaArr
+  console.log("answerAreaArr")
+  console.log(answerAreaArr)
 }
 
 </script>
@@ -168,9 +224,11 @@ function handleDrop(event) {
          :style="{ width: widthOfSheetPx + 'px', height: heightOfSheetPx + 'px', padding: sheetsPaddingPx + 'px'
          , gap:gapBetweenAnswerAreaContainerPx+'px'}">
       <div v-for="j in sheet.numOfAnswerAreaContainers" :key="j" class="answerAreaContainer"
-           :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}">
+           :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}"
+           @dragover.prevent
+           @drop="handleDrop">
         <div v-if="answerAreaContainers[i]&&answerAreaContainers[i][j-1]"
-             v-for="(answerArea,k) in answerAreaContainers[i][j-1]" :key="k">
+             v-for="(answerArea,k) in answerAreaContainers[i][j-1]" :key="answerArea.id" :id="answerArea.id">
           <div v-if="answerArea.type==='infoArea'" class="info-area" :style="infoAreaStyle">
             <div class="barcode" :style="barcodeStyle"></div>
             <div class="title">
@@ -178,7 +236,7 @@ function handleDrop(event) {
             </div>
           </div>
           <BlankAnswerArea v-if="answerArea.type==='blankAnswerArea'" :height="answerArea.height"
-                           :width="answerArea.width"></BlankAnswerArea>
+                           :width="answerArea.width" :area-id="answerArea.id"></BlankAnswerArea>
         </div>
       </div>
     </div>
@@ -209,7 +267,7 @@ function handleDrop(event) {
   display: flex;
   flex-direction: column;
   flex: 1;
-  position: relative;
+
 }
 
 .info-area {
