@@ -5,7 +5,7 @@ const props = defineProps({
 })
 
 function startDrag(event) {
-  event.dataTransfer.setData("text/plain", "blankAnswerArea")
+  event.dataTransfer.setData("text/plain", "new a blankAnswerArea")
   console.log(event)
 }
 

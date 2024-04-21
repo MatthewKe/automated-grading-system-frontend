@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted} from "vue";
+import clickEvent from '@/components/clickState.js'
 
 const props = defineProps({
   width: Number,
@@ -8,7 +9,7 @@ const props = defineProps({
 })
 
 function startDrag(event) {
-  event.dataTransfer.setData("text/plain", props.areaId)
+  event.dataTransfer.setData("text/plain", 'id is ' + props.areaId)
 }
 
 function endDrag(event) {
@@ -25,7 +26,9 @@ onMounted(() => {
   ctx.fillText(props.areaId, canvas.width / 2, canvas.height / 2)
 })
 
-
+function startClick(event) {
+  clickEvent.set('blankAnswerArea', props.areaId)
+}
 </script>
 
 <template>
@@ -34,6 +37,7 @@ onMounted(() => {
       draggable="true"
       @dragstart="startDrag"
       @dragend="endDrag"
+      @click="startClick"
   >
     <canvas id="canvas" :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
   </div>

@@ -1,36 +1,8 @@
 <script setup>
 import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
 import BlankAnswerArea from "@/components/BlankAnswerArea.vue";
-
-let projectConfigJson = ref('{}')
-
-const projectConfig = ref({})
-
-watchEffect(() => {
-  console.log('watchEffect')
-  projectConfig.value = JSON.parse(projectConfigJson.value)
-  for (let i = 1; i < 10; i++) {
-    projectConfig.value.answerAreas?.push({
-      "id": i,
-      "type": "blankAnswerArea",
-      "height": 30
-    })
-  }
-  console.log(projectConfig.value.answerAreas)
-})
-
-fetch('http://localhost:3000/read-file')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.text();
-    })
-    .then(data => {
-      projectConfigJson.value = data
-    })
-    .catch(error => console.error('There has been a problem with your fetch operation:', error));
-
+import InfoArea from "@/components/InfoArea.vue";
+import projectConfig from "@/components/projectConfig.js";
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -80,26 +52,13 @@ const gapBetweenAnswerAreaContainerPx = computed(() => projectConfig.value.gapBe
 
 const gapBetweenAnswerAreaPx = computed(() => projectConfig.value.gapBetweenAnswerArea * pixelPerMm)
 
-const infoAreaStyle = computed(() => ({
-      maxHeight: `${sizeOfInfoAreaPx.value}px`,
-      minHeight: `${sizeOfInfoAreaPx.value}px`
-    })
-)
 
-const barcodeStyle = computed(() => ({
-  maxHeight: `${sizeOfInfoAreaPx.value}px`,
-  minHeight: `${sizeOfInfoAreaPx.value}px`,
-  minWidth: `${sizeOfInfoAreaPx.value}px`,
-  maxWidth: `${sizeOfInfoAreaPx.value}px`,
-  flexBasis: `${sizeOfInfoAreaPx.value}px`
-}))
+let answerAreaContainers = ref([])
 
-
-const answerAreaContainers = computed(() => {
-  console.log('answerAreaContainers computed')
-
-  console.log(updateAnswerAreaContainers())
-  return updateAnswerAreaContainers()
+watch(projectConfig, () => {
+  answerAreaContainers.value = updateAnswerAreaContainers()
+}, {
+  deep: true
 })
 
 function updateAnswerAreaContainers() {
@@ -147,6 +106,8 @@ function updateAnswerAreaContainers() {
     }
 
     let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[i].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[i].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
+    answerArea.width = answerAreaWidthPx / pixelPerMm
+
     answerAreaContainers[i][j].push(
         {
           id: answerArea.id,
@@ -168,13 +129,15 @@ function updateAnswerAreaContainers() {
 
 function handleDrop(event) {
   event.preventDefault();
-  const id = event.dataTransfer.getData('text/plain')
   const answerAreaContainer = event.currentTarget
   const y = event.clientY - answerAreaContainer.getBoundingClientRect().top
   const answerAreaArr = answerAreaContainer.children
-  let idOfSubsequentAnswerArea = null
-  let idOfPreAnswerArea = null
+  let idOfSubsequentAnswerArea = -1
+  let idOfPreAnswerArea = -1
   for (const answerArea of answerAreaArr) {
+    if (answerArea.children[0].className === 'info-area') {
+      continue
+    }
     let answerAreaY = answerArea.getBoundingClientRect().top - answerAreaContainer.getBoundingClientRect().top
     let answerAreaHeight = answerArea.getBoundingClientRect().height
     if (y < answerAreaY + answerAreaHeight / 2) {
@@ -184,36 +147,48 @@ function handleDrop(event) {
       idOfPreAnswerArea = answerArea.id
     }
   }
+
+  const data = event.dataTransfer.getData('text/plain')
+  let id
+  if (data.startsWith('id is')) {
+    id = data.split(' ')[2]
+  }
+  if (data.startsWith('new a')) {
+    id = projectConfig.value.nextId
+    projectConfig.value.nextId++
+    projectConfig.value.answerAreas.push({
+      "id": id,
+      "type": data.split(' ')[2],
+      "height": 40
+    })
+  }
   reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
-  console.log('idOfSubsequentAnswerArea' + idOfSubsequentAnswerArea)
-  console.log('idOfPreAnswerArea' + idOfPreAnswerArea)
-  console.log('indexOfAnswerArea:' + id)
 }
 
 function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnswerArea) {
+  console.log('idOfSubsequentAnswerArea' + idOfSubsequentAnswerArea)
+  console.log('idOfPreAnswerArea' + idOfPreAnswerArea)
+  if (idOfPreAnswerArea === idOfAnswerArea || idOfAnswerArea === idOfSubsequentAnswerArea) {
+    return
+  }
   let answerAreaArr = projectConfig.value.answerAreas
-  let indexOfAnswerArea = answerAreaArr.findIndex((e) => {
-        return e.id === idOfAnswerArea
-      }
-  )
+  let indexOfAnswerArea = answerAreaArr.findIndex((e) => e.id === idOfAnswerArea)
   let answerArea = answerAreaArr[indexOfAnswerArea]
   answerAreaArr.splice(indexOfAnswerArea, 1)
-  if (idOfPreAnswerArea !== null) {
-    console.log()
+  if (idOfPreAnswerArea !== -1) {
     let indexOfPreAnswerArea = answerAreaArr.findIndex(
         (e) => e.id === idOfPreAnswerArea
     )
-    console.log('indexOfPreAnswerArea:' + indexOfPreAnswerArea)
     answerAreaArr.splice(indexOfPreAnswerArea + 1, 0, answerArea)
-  } else if (idOfSubsequentAnswerArea !== null) {
+  } else if (idOfSubsequentAnswerArea !== -1) {
     let indexOfSubsequentAnswerArea = answerAreaArr.findIndex(
         (e) => e.id === idOfSubsequentAnswerArea
     )
     answerAreaArr.splice(indexOfSubsequentAnswerArea, 0, answerArea)
+  } else {
+    answerAreaArr.splice(answerAreaArr.length, 0, answerArea)
   }
   projectConfig.value.answerAreas = answerAreaArr
-  console.log("answerAreaArr")
-  console.log(answerAreaArr)
 }
 
 </script>
@@ -228,13 +203,13 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
            @dragover.prevent
            @drop="handleDrop">
         <div v-if="answerAreaContainers[i]&&answerAreaContainers[i][j-1]"
-             v-for="(answerArea,k) in answerAreaContainers[i][j-1]" :key="answerArea.id" :id="answerArea.id">
-          <div v-if="answerArea.type==='infoArea'" class="info-area" :style="infoAreaStyle">
-            <div class="barcode" :style="barcodeStyle"></div>
-            <div class="title">
-              <h1 style="text-align: center">{{ title }}</h1>
-            </div>
-          </div>
+             v-for="(answerArea,k) in answerAreaContainers[i][j-1]"
+             :key="answerArea.id"
+             :id="answerArea.id"
+             :class="answerArea.type">
+          <InfoArea v-if="answerArea.type==='infoArea'"
+                    :title="title"
+                    :size-of-info-area-px="sizeOfInfoAreaPx"></InfoArea>
           <BlankAnswerArea v-if="answerArea.type==='blankAnswerArea'" :height="answerArea.height"
                            :width="answerArea.width" :area-id="answerArea.id"></BlankAnswerArea>
         </div>
@@ -250,11 +225,6 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
   gap: 20px
 }
 
-.title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .sheet {
   background: white;
@@ -267,21 +237,6 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
   display: flex;
   flex-direction: column;
   flex: 1;
-
-}
-
-.info-area {
-  display: flex;
-}
-
-#info-area > * {
-  flex: 1;
-}
-
-.barcode {
-  background: black;
-  flex-grow: 1;
-  flex-shrink: 0;
 }
 
 
