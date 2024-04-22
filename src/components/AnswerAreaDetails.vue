@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import clickEvent from "@/components/clickState.js";
 import projectConfig from "@/components/projectConfig.js";
 
@@ -8,30 +8,30 @@ const props = defineProps({
 })
 
 const answerArea = computed(() =>
-    projectConfig.value.answerAreas.find((answerArea) => answerArea.id === clickEvent.targetId)
+    projectConfig.value.answerAreas.find((answerArea) => answerArea.id === clickEvent.value.targetId)
 )
 
-const value = ref('')
+
 const options = [
   {
-    value: '选择题',
-    label: 'Option1',
+    value: 'multipleChoiceAnswerArea',
+    label: '选择题',
   },
   {
-    value: '计算题',
-    label: 'Option2',
+    value: 'calculatingAnswerArea',
+    label: '计算题',
   },
   {
-    value: '作文题',
-    label: 'Option3',
+    value: 'essayAnswerArea',
+    label: '作文题',
   },
   {
-    value: '填空题',
-    label: 'Option4',
+    value: 'fillBlanksAnswerArea',
+    label: '填空题',
   },
   {
-    value: '其它',
-    label: 'Option5',
+    value: 'otherAnswerArea',
+    label: '其它',
   },
 ]
 
@@ -43,7 +43,7 @@ const options = [
     <el-divider/>
     <h2>题目类型</h2>
     <el-select
-        v-model="value"
+        v-model="answerArea.type"
         placeholder="Select"
         size="large"
         style="width: 150px"
@@ -52,9 +52,9 @@ const options = [
           v-for="item in options"
           :key="item.value"
           :value="item.value"
+          :label="item.label"
       />
     </el-select>
-
     <el-divider/>
     <h2>答题区域尺寸</h2>
     <div>
@@ -81,6 +81,5 @@ const options = [
   background: #f6f7f8;
   padding: 20px;
 }
-
 
 </style>

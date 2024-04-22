@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted} from "vue";
-import clickEvent from '@/components/clickState.js'
+import clickEvent, {setClickEvent} from '@/components/clickState.js'
 
 const props = defineProps({
   width: Number,
@@ -27,7 +27,7 @@ onMounted(() => {
 })
 
 function startClick(event) {
-  clickEvent.set('blankAnswerArea', props.areaId)
+  setClickEvent('calculatingAnswerArea', props.areaId)
 }
 </script>
 

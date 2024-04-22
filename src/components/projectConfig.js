@@ -8,7 +8,7 @@ watch(projectConfigJson, () => {
     for (let i = 1; i < 20; i++) {
         projectConfig.value.answerAreas?.push({
             "id": projectConfig.value.nextId,
-            "type": "blankAnswerArea",
+            "type": "otherAnswerArea",
             "height": 30
         })
         projectConfig.value.nextId++

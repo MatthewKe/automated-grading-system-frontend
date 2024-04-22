@@ -1,8 +1,9 @@
 <script setup>
 import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
-import BlankAnswerArea from "@/components/BlankAnswerArea.vue";
+import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
 import projectConfig from "@/components/projectConfig.js";
+import CalculatingAnswerArea from "@/components/answerArea/CalculatingAnswerArea.vue";
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -135,6 +136,7 @@ function handleDrop(event) {
   let idOfSubsequentAnswerArea = -1
   let idOfPreAnswerArea = -1
   for (const answerArea of answerAreaArr) {
+    console.log(answerArea)
     if (answerArea.children[0].className === 'info-area') {
       continue
     }
@@ -210,8 +212,12 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
           <InfoArea v-if="answerArea.type==='infoArea'"
                     :title="title"
                     :size-of-info-area-px="sizeOfInfoAreaPx"></InfoArea>
-          <BlankAnswerArea v-if="answerArea.type==='blankAnswerArea'" :height="answerArea.height"
-                           :width="answerArea.width" :area-id="answerArea.id"></BlankAnswerArea>
+          <OtherAnswerArea v-if="answerArea.type==='otherAnswerArea'"
+                           :height="answerArea.height"
+                           :width="answerArea.width" :area-id="answerArea.id"></OtherAnswerArea>
+          <calculating-answer-area v-if="answerArea.type==='calculatingAnswerArea'"
+                                   :height="answerArea.height"
+                                   :width="answerArea.width" :area-id="answerArea.id"></calculating-answer-area>
         </div>
       </div>
     </div>

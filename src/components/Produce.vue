@@ -4,7 +4,6 @@ import PreSet from "@/components/PreSet.vue";
 import plotter from "@/components/Plotter.vue";
 import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 import clickEvent from "@/components/clickState.js";
-import ComponentDetails from "@/components/ComponentDetails.vue";
 import AnswerAreaDetails from "@/components/AnswerAreaDetails.vue";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1

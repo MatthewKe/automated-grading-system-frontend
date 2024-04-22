@@ -1,14 +1,16 @@
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 
-const clickEvent = reactive({
+const clickEvent = ref({
     targetType: '',
     targetId: 0,
-    set(targetType, targetId) {
-        this.targetType = targetType
-        this.targetId = targetId
-        console.log(targetType);
-        console.log(targetId);
-    }
 })
 
+function setClickEvent(targetType, targetId) {
+    clickEvent.value.targetType = targetType
+    clickEvent.value.targetId = targetId
+    console.log(targetType);
+    console.log(targetId);
+}
+
 export default clickEvent
+export {setClickEvent}
