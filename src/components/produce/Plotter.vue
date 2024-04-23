@@ -2,8 +2,12 @@
 import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
 import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
-import projectConfig from "@/components/projectConfig.js";
+import projectConfig, {addAnswerArea} from "@/components/projectConfig.js";
 import CalculatingAnswerArea from "@/components/answerArea/CalculatingAnswerArea.vue";
+import MultipleChoiceAnswerArea from "@/components/answerArea/MultipleChoiceAnswerArea.vue";
+import EssayAnswerArea from "@/components/answerArea/EssayAnswerArea.vue";
+import FillBlanksAnswerArea from "@/components/answerArea/FillBlanksAnswerArea.vue";
+import {setClickEvent} from "@/components/clickState.js";
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -57,8 +61,15 @@ const gapBetweenAnswerAreaPx = computed(() => projectConfig.value.gapBetweenAnsw
 let answerAreaContainers = ref([])
 
 watch(projectConfig, () => {
-  answerAreaContainers.value = updateAnswerAreaContainers()
+  try {
+    answerAreaContainers.value = updateAnswerAreaContainers()
+  } catch (e) {
+    //todo projectConfig的初始化
+    console.log(e)
+  }
+
 }, {
+  immediate: true,
   deep: true
 })
 
@@ -121,13 +132,6 @@ function updateAnswerAreaContainers() {
   return answerAreaContainers
 }
 
-// watch(() => projectConfig.value.numOfSheets, (newVal, oldVal) => {
-//   if (newVal !== oldVal) {
-//     updateAnswerAreaContainers();
-//   }
-// });
-
-
 function handleDrop(event) {
   event.preventDefault();
   const answerAreaContainer = event.currentTarget
@@ -136,7 +140,6 @@ function handleDrop(event) {
   let idOfSubsequentAnswerArea = -1
   let idOfPreAnswerArea = -1
   for (const answerArea of answerAreaArr) {
-    console.log(answerArea)
     if (answerArea.children[0].className === 'info-area') {
       continue
     }
@@ -156,13 +159,7 @@ function handleDrop(event) {
     id = data.split(' ')[2]
   }
   if (data.startsWith('new a')) {
-    id = projectConfig.value.nextId
-    projectConfig.value.nextId++
-    projectConfig.value.answerAreas.push({
-      "id": id,
-      "type": data.split(' ')[2],
-      "height": 40
-    })
+    id = addAnswerArea(data.split(' ')[2])
   }
   reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
 }
@@ -193,6 +190,33 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
   projectConfig.value.answerAreas = answerAreaArr
 }
 
+function getAnswerAreaContainer(i, j) {
+  return answerAreaContainers.value[i] && answerAreaContainers.value[i][j - 1] ? answerAreaContainers.value[i][j - 1] : []
+}
+
+function getAnswerArea(type) {
+  const typeToAnswerAreaMap = {
+    'otherAnswerArea': OtherAnswerArea,
+    'multipleChoiceAnswerArea': MultipleChoiceAnswerArea,
+    'essayAnswerArea': EssayAnswerArea,
+    'calculatingAnswerArea': CalculatingAnswerArea,
+    'fillBlanksAnswerArea': FillBlanksAnswerArea
+  }
+  return typeToAnswerAreaMap[type]
+}
+
+function startDrag(event) {
+  event.dataTransfer.setData("text/plain", 'id is ' + event.currentTarget.id)
+}
+
+function endDrag(event) {
+  event.preventDefault()
+}
+
+function startClick(event) {
+  console.log(event)
+  setClickEvent(event.currentTarget.className, event.currentTarget.id)
+}
 </script>
 
 <template>
@@ -204,20 +228,23 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
            :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}"
            @dragover.prevent
            @drop="handleDrop">
-        <div v-if="answerAreaContainers[i]&&answerAreaContainers[i][j-1]"
-             v-for="(answerArea,k) in answerAreaContainers[i][j-1]"
-             :key="answerArea.id"
-             :id="answerArea.id"
-             :class="answerArea.type">
-          <InfoArea v-if="answerArea.type==='infoArea'"
-                    :title="title"
-                    :size-of-info-area-px="sizeOfInfoAreaPx"></InfoArea>
-          <OtherAnswerArea v-if="answerArea.type==='otherAnswerArea'"
-                           :height="answerArea.height"
-                           :width="answerArea.width" :area-id="answerArea.id"></OtherAnswerArea>
-          <calculating-answer-area v-if="answerArea.type==='calculatingAnswerArea'"
-                                   :height="answerArea.height"
-                                   :width="answerArea.width" :area-id="answerArea.id"></calculating-answer-area>
+        <div
+            v-for="(answerArea) in getAnswerAreaContainer(i,j)"
+            :key="answerArea.id"
+            :id="answerArea.id"
+            :class="answerArea.type"
+            :draggable="answerArea.type === 'infoArea' ? 'false' : 'true'"
+            @dragstart="startDrag"
+            @dragend="endDrag"
+            @click="startClick">
+          <info-area v-if="answerArea.type==='infoArea'" :title="title"
+                     :size-of-info-area-px="sizeOfInfoAreaPx"></info-area>
+          <component :is="getAnswerArea(answerArea.type)"
+                     :height="answerArea.height"
+                     :width="answerArea.width"
+                     :area-id="answerArea.id"
+          ></component>
+
         </div>
       </div>
     </div>
@@ -239,6 +266,7 @@ function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnsw
 }
 
 .answerAreaContainer {
+  border-radius: 20px;
   border: 2.4px solid black;
   display: flex;
   flex-direction: column;

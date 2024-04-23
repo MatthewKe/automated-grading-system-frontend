@@ -5,7 +5,7 @@ import ProduceOverview from "@/components/ProduceOverview.vue";
 import Grade from "@/components/Grade.vue";
 import {createRouter, createWebHashHistory} from 'vue-router'
 import User from "@/components/User.vue";
-import Produce from "@/components/Produce.vue";
+import Produce from "@/components/produce/Produce.vue";
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import V3DragZoom from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";

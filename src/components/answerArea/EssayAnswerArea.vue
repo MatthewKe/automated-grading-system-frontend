@@ -8,13 +8,6 @@ const props = defineProps({
   areaId: Number
 })
 
-function startDrag(event) {
-  event.dataTransfer.setData("text/plain", 'id is ' + props.areaId)
-}
-
-function endDrag(event) {
-  event.preventDefault()
-}
 
 onMounted(() => {
   const canvas = document.getElementById(props.areaId).getElementsByTagName('canvas')[0]
@@ -26,21 +19,13 @@ onMounted(() => {
   ctx.fillText(props.areaId, canvas.width / 2, canvas.height / 2)
 })
 
-function startClick(event) {
-  setClickEvent('otherAnswerArea', props.areaId)
-}
+
 </script>
 
 <template>
-  <div
-      class="draggable"
-      draggable="true"
-      @dragstart="startDrag"
-      @dragend="endDrag"
-      @click="startClick"
-  >
-    <canvas id="canvas" :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
-  </div>
+
+  <canvas id="canvas" :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
+
 </template>
 
 <style scoped>

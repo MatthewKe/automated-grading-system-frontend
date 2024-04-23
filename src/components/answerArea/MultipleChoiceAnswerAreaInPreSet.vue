@@ -7,7 +7,7 @@ const props = defineProps({
 })
 
 function startDrag(event) {
-  event.dataTransfer.setData("text/plain", "new a otherAnswerArea")
+  event.dataTransfer.setData("text/plain", "new a multipleChoiceAnswerArea")
 }
 
 function endDrag(event) {
@@ -16,21 +16,21 @@ function endDrag(event) {
 
 onMounted(() => {
   const canvas = document
-      .getElementById('otherAnswerAreaInPreSet')
+      .getElementById('multipleChoiceAnswerAreaInPreSet')
       .getElementsByTagName('canvas')[0]
   const ctx = canvas.getContext('2d')
   ctx.font = '20px Arial'; // 设置字体大小和类型
   ctx.fillStyle = 'black';   // 设置字体颜色
   ctx.textAlign = 'center';// 设置文字对齐方式
   ctx.textBaseline = 'middle'; // 设置文字垂直对齐方式为中点
-  ctx.fillText('其它题型', canvas.width / 2, canvas.height / 2)
+  ctx.fillText('选择题', canvas.width / 2, canvas.height / 2)
 })
 
 </script>
 
 <template>
   <div
-      id="otherAnswerAreaInPreSet"
+      id="multipleChoiceAnswerAreaInPreSet"
       draggable="true"
       @dragstart="startDrag"
       @dragend="endDrag"
@@ -41,6 +41,7 @@ onMounted(() => {
 
 <style scoped>
 canvas {
+  box-sizing: border-box;
   border: 2px solid #000000;
 }
 </style>

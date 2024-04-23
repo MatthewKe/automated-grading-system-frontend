@@ -1,14 +1,14 @@
 <script setup>
 
-import PreSet from "@/components/PreSet.vue";
-import plotter from "@/components/Plotter.vue";
+import PreSet from "@/components/produce/PreSet.vue";
+import plotter from "@/components/produce/Plotter.vue";
 import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 import clickEvent from "@/components/clickState.js";
-import AnswerAreaDetails from "@/components/AnswerAreaDetails.vue";
+import AnswerAreaDetails from "@/components/produce/AnswerAreaDetails.vue";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 const preSetWidth = 150
-const componentDetailsWidth = 200
+const componentDetailsWidth = 280
 </script>
 
 <template>

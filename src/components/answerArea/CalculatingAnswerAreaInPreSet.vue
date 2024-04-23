@@ -8,7 +8,6 @@ const props = defineProps({
 
 function startDrag(event) {
   event.dataTransfer.setData("text/plain", "new a calculatingAnswerArea")
-  console.log(event)
 }
 
 function endDrag(event) {
