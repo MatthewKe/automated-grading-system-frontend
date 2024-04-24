@@ -1,7 +1,7 @@
 <script setup>
 
 import {computed, ref} from "vue";
-import {addQuestion, deleteQuestion, getAnswerArea} from "@/components/projectConfig.js";
+import {addQuestion, deleteQuestion, getAnswerArea, getPreQuestionNumber} from "@/components/projectConfig.js";
 import clickEvent from "@/components/clickState.js";
 
 
@@ -10,33 +10,25 @@ const ifAutomated = ref(true)
 
 const answerArea = computed(() => getAnswerArea(clickEvent.value.targetId))
 
-const tableData = computed(() => {
-      let tableData = []
-      for (const answer of answerArea.value.answers) {
-        tableData.push({
-          questionNumber: answer.questionNumber,
-          correctAnswer: answer.correctAnswer.join("")
-        })
-      }
-      return tableData
-    }
-)
 
 const deleteRow = (index) => {
-  deleteQuestion(answerArea.value.id, tableData.value[index].questionNumber)
+  deleteQuestion(answerArea.value.id, answerArea.value.answers[index].questionNumber)
 }
 
 const onAddItem = () => {
   let questionNumber
+  let score
   if (answerArea.value.questionNumbers.length === 0) {
-    questionNumber = answerArea.value.preQuestionNumber + 1
+    questionNumber = getPreQuestionNumber(answerArea.value.id) + 1
+    score = 4
   } else {
     questionNumber = answerArea.value.questionNumbers[answerArea.value.questionNumbers.length - 1] + 1
+    score = answerArea.value.answers[answerArea.value.answers.length - 1].score
   }
-
   addQuestion(answerArea.value.id, {
     "questionNumber": questionNumber,
-    "correctAnswer": []
+    "correctAnswer": [],
+    "score": score
   })
 }
 </script>
@@ -44,11 +36,16 @@ const onAddItem = () => {
 <template>
   <h2>自动批卷</h2>
   <el-switch v-model="ifAutomated"/>
-  <el-table :data="tableData" style="width: 90%" max-height="250">
+  <el-table :data="answerArea.answers" style="width: 90%" max-height="250">
     <el-table-column fixed prop="questionNumber" label="题号" width="60"/>
-    <el-table-column prop="correctAnswer" label="正确答案" width="130">
+    <el-table-column prop="correctAnswer" label="答案" width="80">
       <template #default="scope">
-        <el-input v-model="scope.row.correctAnswer" size="large"></el-input>
+        <el-input v-model="answerArea.answers[scope.$index].correctAnswer" size="small"></el-input>
+      </template>
+    </el-table-column>
+    <el-table-column prop="score" label="分值" width="60">
+      <template #default="scope">
+        <el-input v-model="answerArea.answers[scope.$index].score" size="small"></el-input>
       </template>
     </el-table-column>
     <el-table-column fixed="right" label="" width="40">

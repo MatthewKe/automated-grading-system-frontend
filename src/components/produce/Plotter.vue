@@ -2,7 +2,7 @@
 import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
 import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
-import projectConfig, {addAnswerArea} from "@/components/projectConfig.js";
+import projectConfig, {addAnswerArea, reorderAnswerArea} from "@/components/projectConfig.js";
 import CalculatingAnswerArea from "@/components/answerArea/CalculatingAnswerArea.vue";
 import MultipleChoiceAnswerArea from "@/components/answerArea/MultipleChoiceAnswerArea.vue";
 import EssayAnswerArea from "@/components/answerArea/EssayAnswerArea.vue";
@@ -62,12 +62,12 @@ let answerAreaContainers = ref([])
 
 watch(projectConfig, () => {
   try {
+
     answerAreaContainers.value = updateAnswerAreaContainers()
   } catch (e) {
     //todo projectConfig的初始化
     console.log(e)
   }
-
 }, {
   immediate: true,
   deep: true
@@ -129,6 +129,7 @@ function updateAnswerAreaContainers() {
         })
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
+
   return answerAreaContainers
 }
 
@@ -157,38 +158,14 @@ function handleDrop(event) {
   let id
   if (data.startsWith('id is')) {
     id = data.split(' ')[2]
+    reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
   }
   if (data.startsWith('new a')) {
-    id = addAnswerArea(data.split(' ')[2])
+
+    addAnswerArea(data.split(' ')[2], Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea))
   }
-  reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
 }
 
-function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnswerArea) {
-  console.log('idOfSubsequentAnswerArea' + idOfSubsequentAnswerArea)
-  console.log('idOfPreAnswerArea' + idOfPreAnswerArea)
-  if (idOfPreAnswerArea === idOfAnswerArea || idOfAnswerArea === idOfSubsequentAnswerArea) {
-    return
-  }
-  let answerAreaArr = projectConfig.value.answerAreas
-  let indexOfAnswerArea = answerAreaArr.findIndex((e) => e.id === idOfAnswerArea)
-  let answerArea = answerAreaArr[indexOfAnswerArea]
-  answerAreaArr.splice(indexOfAnswerArea, 1)
-  if (idOfPreAnswerArea !== -1) {
-    let indexOfPreAnswerArea = answerAreaArr.findIndex(
-        (e) => e.id === idOfPreAnswerArea
-    )
-    answerAreaArr.splice(indexOfPreAnswerArea + 1, 0, answerArea)
-  } else if (idOfSubsequentAnswerArea !== -1) {
-    let indexOfSubsequentAnswerArea = answerAreaArr.findIndex(
-        (e) => e.id === idOfSubsequentAnswerArea
-    )
-    answerAreaArr.splice(indexOfSubsequentAnswerArea, 0, answerArea)
-  } else {
-    answerAreaArr.splice(answerAreaArr.length, 0, answerArea)
-  }
-  projectConfig.value.answerAreas = answerAreaArr
-}
 
 function getAnswerAreaContainer(i, j) {
   return answerAreaContainers.value[i] && answerAreaContainers.value[i][j - 1] ? answerAreaContainers.value[i][j - 1] : []

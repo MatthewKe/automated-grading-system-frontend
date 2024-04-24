@@ -8,7 +8,7 @@ import AnswerAreaDetails from "@/components/produce/AnswerAreaDetails.vue";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 const preSetWidth = 150
-const componentDetailsWidth = 280
+const componentDetailsWidth = 300
 </script>
 
 <template>
