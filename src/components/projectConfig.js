@@ -30,26 +30,18 @@ function getAnswerAreaIndex(id) {
 
 export function deleteQuestion(answerAreaId, questionNumber) {
     let answerArea = getAnswerArea(answerAreaId)
-    let questionNumbers = answerArea.questionNumbers
-    let indexOfQuestion = questionNumbers.findIndex((q) => q === questionNumber)
     let answers = answerArea.answers
+    let indexOfQuestion = answers.findIndex((a) => a.questionNumber === questionNumber)
     answers.splice(indexOfQuestion, 1)
-    questionNumbers.splice(indexOfQuestion, 1)
     //处理后续题目序号
-    decrementAfterIndex4questionNumbers(questionNumbers, indexOfQuestion)
     decrementAfterIndex4answers(answers, indexOfQuestion)
     for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
         let answerArea = projectConfig.value.answerAreas[i]
-        decrementAfterIndex4questionNumbers(answerArea.questionNumbers, 0)
+
         decrementAfterIndex4answers(answerArea.answers, 0)
     }
 }
 
-function decrementAfterIndex4questionNumbers(questionNumbers, index) {
-    for (let i = index; i < questionNumbers.length; i++) {
-        questionNumbers[i] -= 1;
-    }
-}
 
 function decrementAfterIndex4answers(answers, index) {
     for (let i = index; i < answers.length; i++) {
@@ -57,11 +49,6 @@ function decrementAfterIndex4answers(answers, index) {
     }
 }
 
-function incrementAfterIndex4questionNumbers(questionNumbers, index) {
-    for (let i = index; i < questionNumbers.length; i++) {
-        questionNumbers[i] += 1;
-    }
-}
 
 function incrementAfterIndex4answers(answers, index) {
     for (let i = index; i < answers.length; i++) {
@@ -74,34 +61,30 @@ export function getPreQuestionNumber(answerAreaId) {
     if (answerAreaIndex === 0) {
         return 0
     }
-    return projectConfig.value.answerAreas[answerAreaIndex - 1].questionNumbers.slice(-1)[0]
+    return projectConfig.value.answerAreas[answerAreaIndex - 1].answers.slice(-1)[0].questionNumber
 }
 
-export function addQuestion(answerAreaId, answer) {
-    let answerArea = getAnswerArea(answerAreaId)
-    let questionNumbers = answerArea.questionNumbers
-    let nextQuestionNumber
-    if (questionNumbers.length === 0) {
-        let preQuestionNumber = getPreQuestionNumber(answerAreaId)
 
+export function addAnswer(answerAreaId, correctAnswer, score) {
+    let answerArea = getAnswerArea(answerAreaId)
+    let answers = answerArea.answers
+    let nextQuestionNumber
+    if (answerArea.answers.length === 0) {
+        let preQuestionNumber = getPreQuestionNumber(answerAreaId)
         nextQuestionNumber = preQuestionNumber + 1
     } else {
-        nextQuestionNumber = questionNumbers[questionNumbers.length - 1] + 1
+        nextQuestionNumber = answers[answers.length - 1].questionNumber + 1
     }
-    if (nextQuestionNumber !== answer.questionNumber) {
-        console.log(nextQuestionNumber)
-        console.log(answer.questionNumber)
-        throw new Error('nextQuestionNumber !== answer.questionNumber')
+    let answer = {
+        questionNumber: nextQuestionNumber,
+        correctAnswer: correctAnswer,
+        score: score
     }
-    questionNumbers.push(answer.questionNumber)
-    let answers = answerArea.answers
     answers.push(answer)
     //处理后续题目序号
-    incrementAfterIndex4questionNumbers(questionNumbers, nextQuestionNumber + 1)
     incrementAfterIndex4answers(answers, nextQuestionNumber + 1)
     for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
         let answerArea = projectConfig.value.answerAreas[i]
-        incrementAfterIndex4questionNumbers(answerArea.questionNumbers, 0)
         incrementAfterIndex4answers(answerArea.answers, 0)
     }
 }
@@ -113,8 +96,7 @@ export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea)
         id: id,
         type: type,
         height: 40,
-        answers: [],
-        questionNumbers: [],
+        answers: []
     })
     reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, id)
 }

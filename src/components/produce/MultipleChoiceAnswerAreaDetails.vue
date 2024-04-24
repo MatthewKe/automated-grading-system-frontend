@@ -1,42 +1,41 @@
 <script setup>
 
-import {computed, ref} from "vue";
-import {addQuestion, deleteQuestion, getAnswerArea, getPreQuestionNumber} from "@/components/projectConfig.js";
+import {computed, nextTick, ref} from "vue";
+import {addAnswer, deleteQuestion, getAnswerArea, getPreQuestionNumber} from "@/components/projectConfig.js";
 import clickEvent from "@/components/clickState.js";
 
-
 const ifAutomated = ref(true)
-
-
 const answerArea = computed(() => getAnswerArea(clickEvent.value.targetId))
-
-
 const deleteRow = (index) => {
   deleteQuestion(answerArea.value.id, answerArea.value.answers[index].questionNumber)
 }
 
 const onAddItem = () => {
-  let questionNumber
   let score
-  if (answerArea.value.questionNumbers.length === 0) {
-    questionNumber = getPreQuestionNumber(answerArea.value.id) + 1
+  if (answerArea.value.answers.length === 0) {
     score = 4
   } else {
-    questionNumber = answerArea.value.questionNumbers[answerArea.value.questionNumbers.length - 1] + 1
     score = answerArea.value.answers[answerArea.value.answers.length - 1].score
   }
-  addQuestion(answerArea.value.id, {
-    "questionNumber": questionNumber,
-    "correctAnswer": [],
-    "score": score
+  addAnswer(answerArea.value.id, [], score)
+  nextTick(() => {
+    scrollToBottom();
   })
+}
+const tableRef = ref(null)
+
+function scrollToBottom() {
+  const table = tableRef.value.$el.querySelector('.el-scrollbar__wrap');
+  if (table) {
+    table.scrollTop = table.scrollHeight;
+  }
 }
 </script>
 
 <template>
   <h2>自动批卷</h2>
   <el-switch v-model="ifAutomated"/>
-  <el-table :data="answerArea.answers" style="width: 90%" max-height="250">
+  <el-table ref="tableRef" :data="answerArea.answers" style="width: 90%" max-height="230">
     <el-table-column fixed prop="questionNumber" label="题号" width="60"/>
     <el-table-column prop="correctAnswer" label="答案" width="80">
       <template #default="scope">
@@ -61,8 +60,8 @@ const onAddItem = () => {
       </template>
     </el-table-column>
   </el-table>
-  <el-button class="mt-4" style="width: 90%" @click="onAddItem">
-    Add Item
+  <el-button style="width: 90%" @click="onAddItem">
+    添加题目
   </el-button>
   <el-divider/>
   <h2>答题区域尺寸</h2>
