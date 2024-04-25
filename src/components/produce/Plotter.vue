@@ -1,5 +1,5 @@
 <script setup>
-import {computed, createApp, onBeforeMount, watch, ref, watchEffect} from 'vue'
+import {computed, ref, watch} from 'vue'
 import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
 import projectConfig, {addAnswerArea, reorderAnswerArea} from "@/components/projectConfig.js";
@@ -47,7 +47,7 @@ const borderOfAnswerAreaContainerPx = 2.4
 
 const heightOfAnswerAreaContainerPx = computed(() => heightOfSheetPx.value - 2 * answerAreaContainerPaddingPx.value - 2 * borderOfAnswerAreaContainerPx)
 
-const sizeOfInfoAreaPx = computed(() => projectConfig.value.heightOfInfoArea * pixelPerMm)
+const sizeOfInfoAreaPx = computed(() => 198)
 
 const title = computed(() => projectConfig.value.title)
 
@@ -89,7 +89,6 @@ function updateAnswerAreaContainers() {
     }
     answerAreaContainers.push(answerAreaContainer)
   }
-
   let answerAreas = projectConfig.value.answerAreas
 
   //计算填充answerAreaContainers
@@ -161,7 +160,6 @@ function handleDrop(event) {
     reorderAnswerArea(Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea), Number(id))
   }
   if (data.startsWith('new a')) {
-
     addAnswerArea(data.split(' ')[2], Number(idOfPreAnswerArea), Number(idOfSubsequentAnswerArea))
   }
 }
@@ -190,21 +188,26 @@ function endDrag(event) {
   event.preventDefault()
 }
 
-function startClick(event) {
-  console.log(event)
+function handleAnswerAreaClick(event) {
   setClickEvent(event.currentTarget.className, event.currentTarget.id)
+}
+
+function handleSheetClick(event) {
+  setClickEvent('sheet', event.currentTarget.id)
 }
 </script>
 
 <template>
   <div id="sheetContainer">
-    <div v-for="(sheet, i) in sheets" :key="i" class="sheet"
+    <div v-for="(sheet, i) in sheets" :key="i" class="sheet" :id="`sheet-${i}`"
          :style="{ width: widthOfSheetPx + 'px', height: heightOfSheetPx + 'px', padding: sheetsPaddingPx + 'px'
-         , gap:gapBetweenAnswerAreaContainerPx+'px'}">
+         , gap:gapBetweenAnswerAreaContainerPx+'px'}"
+         @click="handleSheetClick">
       <div v-for="j in sheet.numOfAnswerAreaContainers" :key="j" class="answerAreaContainer"
            :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}"
            @dragover.prevent
-           @drop="handleDrop">
+           @drop="handleDrop"
+      >
         <div
             v-for="(answerArea) in getAnswerAreaContainer(i,j)"
             :key="answerArea.id"
@@ -213,7 +216,7 @@ function startClick(event) {
             :draggable="answerArea.type === 'infoArea' ? 'false' : 'true'"
             @dragstart="startDrag"
             @dragend="endDrag"
-            @click="startClick">
+            @click.stop="handleAnswerAreaClick">
           <info-area v-if="answerArea.type==='infoArea'" :title="title"
                      :size-of-info-area-px="sizeOfInfoAreaPx"></info-area>
           <component :is="getAnswerArea(answerArea.type)"

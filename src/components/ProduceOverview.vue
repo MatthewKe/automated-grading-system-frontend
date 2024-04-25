@@ -3,7 +3,6 @@
 import LocalImg from '@/assets/sample.png'
 import AddImg from '@/assets/add.png'
 import {ref} from 'vue'
-import SearchBox from "@/components/Searchbox.vue";
 import {useRouter} from "vue-router";
 
 const papers = ref([LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg])

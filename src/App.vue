@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref} from 'vue'
 
 const user_state = ref('登录/注册');
 

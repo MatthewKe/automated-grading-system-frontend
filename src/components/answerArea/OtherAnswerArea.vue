@@ -1,6 +1,5 @@
 <script setup>
 import {onMounted} from "vue";
-import clickEvent, {setClickEvent} from '@/components/clickState.js'
 
 const props = defineProps({
   width: Number,

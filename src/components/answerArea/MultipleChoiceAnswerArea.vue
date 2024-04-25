@@ -1,7 +1,6 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
-import clickEvent, {setClickEvent} from '@/components/clickState.js'
-import projectConfig, {getAnswerArea} from "@/components/projectConfig.js";
+import {computed, onMounted} from "vue";
+import projectConfig, {getAnswerAreaAccordingId} from "@/components/projectConfig.js";
 
 const props = defineProps({
   width: Number,
@@ -22,10 +21,12 @@ const clientAnswerStyle = {
   height: defaultClientAnswerHeightPx + 'px'
 }
 
-const answerArea = computed(() => getAnswerArea(props.areaId))
+const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))
 const updateHeight = (entries) => {
   for (const entry of entries) {
-    answerArea.value.height = entry.contentRect.height / pixelPerMm
+    if (answerArea.value) {
+      answerArea.value.height = entry.contentRect.height / pixelPerMm
+    }
   }
 }
 

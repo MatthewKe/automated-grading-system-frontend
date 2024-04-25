@@ -5,7 +5,6 @@ let projectConfigJson = ref('{}')
 const projectConfig = ref({})
 watch(projectConfigJson, () => {
     projectConfig.value = JSON.parse(projectConfigJson.value)
-
 })
 
 fetch('http://localhost:3000/read-file')
@@ -20,7 +19,7 @@ fetch('http://localhost:3000/read-file')
     })
     .catch(error => console.error('There has been a problem with your fetch operation:', error));
 
-export function getAnswerArea(id) {
+export function getAnswerAreaAccordingId(id) {
     return projectConfig.value.answerAreas.find((answerArea) => answerArea.id === Number(id))
 }
 
@@ -28,24 +27,10 @@ function getAnswerAreaIndex(id) {
     return projectConfig.value.answerAreas.findIndex((answerArea) => answerArea.id === Number(id))
 }
 
-export function deleteQuestion(answerAreaId, questionNumber) {
-    let answerArea = getAnswerArea(answerAreaId)
-    let answers = answerArea.answers
-    let indexOfQuestion = answers.findIndex((a) => a.questionNumber === questionNumber)
-    answers.splice(indexOfQuestion, 1)
-    //处理后续题目序号
-    decrementAfterIndex4answers(answers, indexOfQuestion)
-    for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
-        let answerArea = projectConfig.value.answerAreas[i]
 
-        decrementAfterIndex4answers(answerArea.answers, 0)
-    }
-}
-
-
-function decrementAfterIndex4answers(answers, index) {
+function decrementAfterIndex4answers(answers, index, decrementVal) {
     for (let i = index; i < answers.length; i++) {
-        answers[i].questionNumber -= 1
+        answers[i].questionNumber -= decrementVal
     }
 }
 
@@ -64,9 +49,24 @@ export function getPreQuestionNumber(answerAreaId) {
     return projectConfig.value.answerAreas[answerAreaIndex - 1].answers.slice(-1)[0].questionNumber
 }
 
+export function deleteAnswer(answerAreaId, questionNumber) {
+    let answerArea = getAnswerAreaAccordingId(answerAreaId)
+    let answers = answerArea.answers
+    let indexOfQuestion = answers.findIndex((a) => a.questionNumber === questionNumber)
+    answers.splice(indexOfQuestion, 1)
+    //处理后续题目序号
+    decrementAfterIndex4answers(answers, indexOfQuestion, 1)
+    for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
+        let answerArea = projectConfig.value.answerAreas[i]
+        decrementAfterIndex4answers(answerArea.answers, 0, 1)
+    }
+    if (answers.length === 0) {
+        deleteAnswerArea(answerAreaId)
+    }
+}
 
 export function addAnswer(answerAreaId, correctAnswer, score) {
-    let answerArea = getAnswerArea(answerAreaId)
+    let answerArea = getAnswerAreaAccordingId(answerAreaId)
     let answers = answerArea.answers
     let nextQuestionNumber
     if (answerArea.answers.length === 0) {
@@ -89,6 +89,17 @@ export function addAnswer(answerAreaId, correctAnswer, score) {
     }
 }
 
+export function deleteAnswerArea(answerAreaId) {
+    let answerArea = getAnswerAreaAccordingId(answerAreaId)
+    let decrementVal = answerArea.answers.length
+    let answerAreaIndex = getAnswerAreaIndex(answerAreaId)
+    projectConfig.value.answerAreas.splice(answerAreaIndex, 1)
+    for (let i = answerAreaIndex; i < projectConfig.value.answerAreas.length; i++) {
+        let answerArea = projectConfig.value.answerAreas[i]
+        decrementAfterIndex4answers(answerArea.answers, 0, decrementVal)
+    }
+}
+
 export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea) {
     let id = projectConfig.value.nextId
     projectConfig.value.nextId++
@@ -99,6 +110,7 @@ export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea)
         answers: []
     })
     reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, id)
+    addAnswer(id, [], 0)
 }
 
 export function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnswerArea) {

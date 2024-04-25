@@ -3,12 +3,15 @@
 import PreSet from "@/components/produce/PreSet.vue";
 import plotter from "@/components/produce/Plotter.vue";
 import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
-import clickEvent from "@/components/clickState.js";
+
 import AnswerAreaDetails from "@/components/produce/AnswerAreaDetails.vue";
+import SheetDetails from "@/components/produce/SheetDetails.vue";
+import detailsInfo from "@/components/detailsOfProduce.js";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 const preSetWidth = 150
 const componentDetailsWidth = 300
+
 </script>
 
 <template>
@@ -17,8 +20,12 @@ const componentDetailsWidth = 300
     <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0">
       <plotter style="flex:0 0 auto;"></plotter>
     </v3-drag-zoom-container>
-    <AnswerAreaDetails v-if="clickEvent.targetType.includes('AnswerArea')"
-                       :component-details-width="componentDetailsWidth"></AnswerAreaDetails>
+    <el-scrollbar>
+      <AnswerAreaDetails v-if="detailsInfo.type.includes('AnswerArea')"
+                         :component-details-width="componentDetailsWidth"></AnswerAreaDetails>
+      <SheetDetails v-if="detailsInfo.type.includes('Sheet')"
+                    :component-details-width="componentDetailsWidth"></SheetDetails>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -27,9 +34,4 @@ const componentDetailsWidth = 300
   display: flex;
 }
 
-.resizer {
-  cursor: col-resize;
-  width: 3px;
-  height: 100%;
-}
 </style>

@@ -1,15 +1,20 @@
 <script setup>
-import {computed, ref, watch, watchEffect} from "vue";
-import clickEvent from "@/components/clickState.js";
-import projectConfig, {getAnswerArea} from "@/components/projectConfig.js";
+import {computed, watch} from "vue";
+import {getAnswerAreaAccordingId} from "@/components/projectConfig.js";
 import MultipleChoiceAnswerAreaDetails from "@/components/produce/MultipleChoiceAnswerAreaDetails.vue";
+import detailsInfo, {answerAreaUndefined, getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
 
 const props = defineProps({
   componentDetailsWidth: Number
 })
 
-const answerArea = computed(() => getAnswerArea(clickEvent.value.targetId))
+const answerArea = computed(() => getAnswerArea4AnswerAreaDetails())
 
+watch(answerArea, () => {
+  if (answerArea.value === undefined) {
+    answerAreaUndefined()
+  }
+})
 
 const options = [
   {
@@ -42,7 +47,7 @@ const typeToComponentMap = {
 
 <template>
   <div id="component-details-container" :style="{width:componentDetailsWidth+'px'}">
-    <el-scrollbar>
+    <div v-if="answerArea">
       <h1>题目详情</h1>
       <el-divider/>
       <h2>题目类型</h2>
@@ -61,7 +66,7 @@ const typeToComponentMap = {
       </el-select>
       <el-divider/>
       <Component :is="typeToComponentMap[answerArea.type]"></Component>
-    </el-scrollbar>
+    </div>
   </div>
 </template>
 
