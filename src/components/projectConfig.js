@@ -23,7 +23,7 @@ export function getAnswerAreaAccordingId(id) {
     return projectConfig.value.answerAreas.find((answerArea) => answerArea.id === Number(id))
 }
 
-function getAnswerAreaIndex(id) {
+export function getAnswerAreaIndex(id) {
     return projectConfig.value.answerAreas.findIndex((answerArea) => answerArea.id === Number(id))
 }
 
@@ -100,6 +100,10 @@ export function deleteAnswerArea(answerAreaId) {
     }
 }
 
+const typeToDefaultTitle = {
+    'multipleChoiceAnswerArea': '选择题'
+}
+
 export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea) {
     let id = projectConfig.value.nextId
     projectConfig.value.nextId++
@@ -107,7 +111,8 @@ export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea)
         id: id,
         type: type,
         height: 40,
-        answers: []
+        answers: [],
+        title: typeToDefaultTitle[type]
     })
     reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, id)
     addAnswer(id, [], 0)
@@ -135,6 +140,14 @@ export function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, i
         answerAreaArr.splice(answerAreaArr.length, 0, answerArea)
     }
     projectConfig.value.answerAreas = answerAreaArr
+    //修改所有的questionNumber
+    let questionNumber = 1
+    for (const answerArea of answerAreaArr) {
+        let answers = answerArea.answers
+        for (const answer of answers) {
+            answer.questionNumber = questionNumber++
+        }
+    }
 }
 
 export default projectConfig

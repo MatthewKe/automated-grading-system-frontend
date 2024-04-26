@@ -1,8 +1,9 @@
 <script setup>
 import {computed, watch} from "vue";
-import {getAnswerAreaAccordingId} from "@/components/projectConfig.js";
 import MultipleChoiceAnswerAreaDetails from "@/components/produce/MultipleChoiceAnswerAreaDetails.vue";
-import detailsInfo, {answerAreaUndefined, getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
+import {answerAreaUndefined, getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
+import {Delete} from '@element-plus/icons-vue'
+import {deleteAnswerArea} from "@/components/projectConfig.js";
 
 const props = defineProps({
   componentDetailsWidth: Number
@@ -43,12 +44,16 @@ const typeToComponentMap = {
   'multipleChoiceAnswerArea': MultipleChoiceAnswerAreaDetails
 }
 
+
 </script>
 
 <template>
   <div id="component-details-container" :style="{width:componentDetailsWidth+'px'}">
     <div v-if="answerArea">
-      <h1>题目详情</h1>
+      <div style="display: flex;justify-content: space-between;align-items: center;width: 90%">
+        <h1>题目详情</h1>
+        <el-button type="danger" :icon="Delete" circle @click="deleteAnswerArea(answerArea.id)"/>
+      </div>
       <el-divider/>
       <h2>题目类型</h2>
       <el-select
@@ -64,6 +69,9 @@ const typeToComponentMap = {
             :label="item.label"
         />
       </el-select>
+      <el-divider/>
+      <h2>题目标题</h2>
+      <el-input v-model="answerArea.title" style="width: 80%"></el-input>
       <el-divider/>
       <Component :is="typeToComponentMap[answerArea.type]"></Component>
     </div>

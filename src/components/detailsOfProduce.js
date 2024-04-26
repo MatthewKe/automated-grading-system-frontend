@@ -30,6 +30,12 @@ watch(clickEvent, () => {
         detailsInfo.value.type = 'Sheet'
         detailsInfo.value.id = clickEvent.value.targetId
     }
+    if (clickEvent.value.targetType.includes('infoArea')) {
+        detailsInfo.value.type = 'Sheet'
+        detailsInfo.value.id = 'sheet-' + clickEvent.value.targetId.split('-')[1]
+        console.log('detailsInfo.value.id')
+        console.log(detailsInfo.value.id)
+    }
 }, {
     deep: true
 })

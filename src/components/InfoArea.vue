@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed} from "vue";
 
 const props = defineProps({
   sizeOfInfoAreaPx: Number,
@@ -16,11 +16,15 @@ const barcodeStyle = computed(() => ({
   flexBasis: `${sizeOfBarcodePx}px`
 }))
 
+const infoAreaStyle = computed(() => ({
+  maxHeight: `${props.sizeOfInfoAreaPx}px`,
+  minHeight: `${props.sizeOfInfoAreaPx}px`,
+}))
 
 </script>
 
 <template>
-  <div class="info-area">
+  <div class="info-area" :style="infoAreaStyle">
     <div style="display: flex;">
       <div class="barcode" :style="barcodeStyle"></div>
       <div class="title">
@@ -54,6 +58,5 @@ const barcodeStyle = computed(() => ({
   flex: 1 1 auto;
   align-items: center; /* 垂直居中 */
   justify-content: center; /* 水平居中 */
-
 }
 </style>

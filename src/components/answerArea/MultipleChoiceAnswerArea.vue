@@ -1,6 +1,7 @@
 <script setup>
 import {computed, onMounted} from "vue";
-import projectConfig, {getAnswerAreaAccordingId} from "@/components/projectConfig.js";
+import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
+import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
   width: Number,
@@ -22,6 +23,8 @@ const clientAnswerStyle = {
 }
 
 const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))
+
+const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
 const updateHeight = (entries) => {
   for (const entry of entries) {
     if (answerArea.value) {
@@ -41,6 +44,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <AnswerAreaTitle :title-ctx="answerArea.title" :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="answerContainer" :style="{width: width+'px'}">
     <div v-for="answer in answerArea.answers" class="subQuestion">
       <div class="questionNumber" style="font-size: 30px">{{ answer.questionNumber }}</div>

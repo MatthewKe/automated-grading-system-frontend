@@ -7,17 +7,30 @@ import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.j
 import AnswerAreaDetails from "@/components/produce/AnswerAreaDetails.vue";
 import SheetDetails from "@/components/produce/SheetDetails.vue";
 import detailsInfo from "@/components/detailsOfProduce.js";
+import {provide, ref} from "vue";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 const preSetWidth = 150
 const componentDetailsWidth = 300
 
+const zoomContainer = ref()
+
+const resetZoomContainer = () => {
+  console.log('resetZoomContainer')
+  if (zoomContainer) {
+    console.log(zoomContainer.value)
+    zoomContainer.value.reset()
+  }
+  zoomContainer.value.reset()
+}
+
+provide('resetZoomContainer', resetZoomContainer)
 </script>
 
 <template>
   <div id="container" :style="{height: containerHeight+'px'}">
     <pre-set :pre-set-width="preSetWidth"></pre-set>
-    <v3-drag-zoom-container style="background: #EAECEE; flex: 1 1 0">
+    <v3-drag-zoom-container ref="zoomContainer" style="background: #EAECEE; flex: 1 1 0">
       <plotter style="flex:0 0 auto;"></plotter>
     </v3-drag-zoom-container>
     <el-scrollbar>

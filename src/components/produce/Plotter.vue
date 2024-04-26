@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, watch} from 'vue'
+import {computed, inject, onMounted, ref, watch} from 'vue'
 import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
 import projectConfig, {addAnswerArea, reorderAnswerArea} from "@/components/projectConfig.js";
@@ -13,6 +13,7 @@ const sizes = {
   A3: {width: 420, height: 297},
   A4: {width: 297, height: 210}
 }
+const sizeOfInfoAreaPx = computed(() => 198)
 
 const dpi = 96
 const mmToInch = 25.4
@@ -47,8 +48,6 @@ const borderOfAnswerAreaContainerPx = 2.4
 
 const heightOfAnswerAreaContainerPx = computed(() => heightOfSheetPx.value - 2 * answerAreaContainerPaddingPx.value - 2 * borderOfAnswerAreaContainerPx)
 
-const sizeOfInfoAreaPx = computed(() => 198)
-
 const title = computed(() => projectConfig.value.title)
 
 const sheets = computed(() => projectConfig.value.sheets)
@@ -62,7 +61,6 @@ let answerAreaContainers = ref([])
 
 watch(projectConfig, () => {
   try {
-
     answerAreaContainers.value = updateAnswerAreaContainers()
   } catch (e) {
     //todo projectConfig的初始化
@@ -76,7 +74,7 @@ watch(projectConfig, () => {
 function updateAnswerAreaContainers() {
   //生成answerAreaContainers，并且预装info-area
   let answerAreaContainers = []
-  let numOfSheets = projectConfig.value.numOfSheets
+  let numOfSheets = projectConfig.value.sheets.length
   for (let i = 0; i < numOfSheets; i++) {
     let numOfAnswerAreaContainers = sheets.value[i].numOfAnswerAreaContainers
     let answerAreaContainer = []
@@ -107,12 +105,11 @@ function updateAnswerAreaContainers() {
       j = 0
       heightLeftPx = heightLeftPx - sizeOfInfoAreaPx.value
     }
-    if (i >= projectConfig.value.numOfSheets) {
+    if (i >= projectConfig.value.sheets.length) {
       //需要新增一个sheet
       projectConfig.value.sheets.push({
         "numOfAnswerAreaContainers": 3
       })
-      projectConfig.value.numOfSheets++
       return answerAreaContainers
     }
 
@@ -128,7 +125,6 @@ function updateAnswerAreaContainers() {
         })
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
-
   return answerAreaContainers
 }
 
@@ -152,7 +148,6 @@ function handleDrop(event) {
       idOfPreAnswerArea = answerArea.id
     }
   }
-
   const data = event.dataTransfer.getData('text/plain')
   let id
   if (data.startsWith('id is')) {
@@ -195,10 +190,23 @@ function handleAnswerAreaClick(event) {
 function handleSheetClick(event) {
   setClickEvent('sheet', event.currentTarget.id)
 }
+
+const resetZoomContainer = inject('resetZoomContainer')
+const sheetContainer = ref(null)
+onMounted(() => {
+  const resizeObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      resetZoomContainer()
+    }
+  })
+  resizeObserver.observe(sheetContainer.value)
+})
+
+
 </script>
 
 <template>
-  <div id="sheetContainer">
+  <div id="sheetContainer" ref="sheetContainer">
     <div v-for="(sheet, i) in sheets" :key="i" class="sheet" :id="`sheet-${i}`"
          :style="{ width: widthOfSheetPx + 'px', height: heightOfSheetPx + 'px', padding: sheetsPaddingPx + 'px'
          , gap:gapBetweenAnswerAreaContainerPx+'px'}"
@@ -211,14 +219,14 @@ function handleSheetClick(event) {
         <div
             v-for="(answerArea) in getAnswerAreaContainer(i,j)"
             :key="answerArea.id"
-            :id="answerArea.id"
+            :id="answerArea.id != null ? answerArea.id : `infoArea-${i}`"
             :class="answerArea.type"
             :draggable="answerArea.type === 'infoArea' ? 'false' : 'true'"
             @dragstart="startDrag"
             @dragend="endDrag"
             @click.stop="handleAnswerAreaClick">
           <info-area v-if="answerArea.type==='infoArea'" :title="title"
-                     :size-of-info-area-px="sizeOfInfoAreaPx"></info-area>
+                     :size-of-info-area-px="sizeOfInfoAreaPx" :id="`infoArea-${i}`"></info-area>
           <component :is="getAnswerArea(answerArea.type)"
                      :height="answerArea.height"
                      :width="answerArea.width"
