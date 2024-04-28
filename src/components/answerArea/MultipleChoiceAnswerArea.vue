@@ -3,6 +3,7 @@ import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
+
 const props = defineProps({
   width: Number,
   height: Number,
@@ -16,7 +17,7 @@ const pixelPerMm = dpi / mmToInch
 const defaultFontWidth = projectConfig.value.defaultFontWidth
 const defaultFontWidthPx = defaultFontWidth * pixelPerMm
 const defaultClientAnswerWidthPx = 4 * defaultFontWidthPx
-const defaultClientAnswerHeightPx = 3 * defaultFontWidthPx
+const defaultClientAnswerHeightPx = 2 * defaultFontWidthPx
 const clientAnswerStyle = {
   width: defaultClientAnswerWidthPx + 'px',
   height: defaultClientAnswerHeightPx + 'px'
@@ -40,6 +41,7 @@ onMounted(() => {
     observer.observe(element);
   }
 })
+
 
 </script>
 

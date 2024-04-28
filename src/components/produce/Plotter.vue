@@ -176,14 +176,17 @@ function getAnswerArea(type) {
 }
 
 function startDrag(event) {
+  console.log('startDrag')
   event.dataTransfer.setData("text/plain", 'id is ' + event.currentTarget.id)
 }
 
 function endDrag(event) {
+  console.log('endDrag')
   event.preventDefault()
 }
 
 function handleAnswerAreaClick(event) {
+  console.log('handleAnswerAreaClick')
   setClickEvent(event.currentTarget.className, event.currentTarget.id)
 }
 
@@ -193,6 +196,7 @@ function handleSheetClick(event) {
 
 const resetZoomContainer = inject('resetZoomContainer')
 const sheetContainer = ref(null)
+
 onMounted(() => {
   const resizeObserver = new ResizeObserver(entries => {
     for (const entry of entries) {
@@ -232,7 +236,6 @@ onMounted(() => {
                      :width="answerArea.width"
                      :area-id="answerArea.id"
           ></component>
-
         </div>
       </div>
     </div>
@@ -240,6 +243,8 @@ onMounted(() => {
 </template>
 
 <style>
+
+
 #sheetContainer {
   display: flex;
   flex-direction: column;

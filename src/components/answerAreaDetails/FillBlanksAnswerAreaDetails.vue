@@ -1,8 +1,9 @@
 <script setup>
 
 import {computed, nextTick, ref} from "vue";
-import {addAnswer, deleteAnswer} from "@/components/projectConfig.js";
+import {defaultAddAnswer, deleteAnswer} from "@/components/projectConfig.js";
 import {getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
+
 
 const ifAutomated = ref(true)
 const answerArea = computed(() => getAnswerArea4AnswerAreaDetails())
@@ -17,7 +18,7 @@ const onAddItem = () => {
   } else {
     score = answerArea.value.answers[answerArea.value.answers.length - 1].score
   }
-  addAnswer(answerArea.value.id, [], score)
+  defaultAddAnswer(answerArea.value.id, [], score)
   nextTick(() => {
     scrollToBottom();
   })

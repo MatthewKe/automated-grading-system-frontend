@@ -35,7 +35,7 @@ function decrementAfterIndex4answers(answers, index, decrementVal) {
 }
 
 
-function incrementAfterIndex4answers(answers, index) {
+export function incrementAfterIndex4answers(answers, index) {
     for (let i = index; i < answers.length; i++) {
         answers[i].questionNumber += 1
     }
@@ -65,7 +65,7 @@ export function deleteAnswer(answerAreaId, questionNumber) {
     }
 }
 
-export function addAnswer(answerAreaId, correctAnswer, score) {
+function addAnswer(answerAreaId, correctAnswer, score) {
     let answerArea = getAnswerAreaAccordingId(answerAreaId)
     let answers = answerArea.answers
     let nextQuestionNumber
@@ -100,8 +100,64 @@ export function deleteAnswerArea(answerAreaId) {
     }
 }
 
+
+export function defaultAddAnswer(answerAreaId, correctAnswer, score) {
+    console.log('defaultAddAnswer')
+    let answerArea = getAnswerAreaAccordingId(answerAreaId)
+    let answers = answerArea.answers
+    let nextQuestionNumber
+    if (answerArea.answers.length === 0) {
+        let preQuestionNumber = getPreQuestionNumber(answerAreaId)
+        nextQuestionNumber = preQuestionNumber + 1
+    } else {
+        nextQuestionNumber = answers[answers.length - 1].questionNumber + 1
+    }
+    let answer = {
+        questionNumber: nextQuestionNumber,
+        correctAnswer: correctAnswer,
+        score: score
+    }
+    answers.push(answer)
+    //处理后续题目序号
+    incrementAfterIndex4answers(answers, nextQuestionNumber + 1)
+    for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
+        let answerArea = projectConfig.value.answerAreas[i]
+        incrementAfterIndex4answers(answerArea.answers, 0)
+    }
+}
+
+function essayAddAnswer(answerAreaId, correctAnswer, score, numOfLines) {
+    let answerArea = getAnswerAreaAccordingId(answerAreaId)
+    let answers = answerArea.answers
+    let nextQuestionNumber
+    if (answerArea.answers.length === 0) {
+        let preQuestionNumber = getPreQuestionNumber(answerAreaId)
+        nextQuestionNumber = preQuestionNumber + 1
+    } else {
+        nextQuestionNumber = answers[answers.length - 1].questionNumber + 1
+    }
+    let answer = {
+        questionNumber: nextQuestionNumber,
+        correctAnswer: correctAnswer,
+        score: score,
+        numOfLines: numOfLines
+    }
+    answers.push(answer)
+    //处理后续题目序号
+    incrementAfterIndex4answers(answers, nextQuestionNumber + 1)
+    for (let i = getAnswerAreaIndex(answerAreaId) + 1; i < projectConfig.value.answerAreas.length; i++) {
+        let answerArea = projectConfig.value.answerAreas[i]
+        incrementAfterIndex4answers(answerArea.answers, 0)
+    }
+}
+
+
 const typeToDefaultTitle = {
-    'multipleChoiceAnswerArea': '选择题'
+    'multipleChoiceAnswerArea': '选择题',
+    'fillBlanksAnswerArea': '填空题',
+    'calculatingAnswerArea': '计算题',
+    'otherAnswerArea': '其它题型',
+    'essayAnswerArea': '作文题'
 }
 
 export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea) {
@@ -114,8 +170,12 @@ export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea)
         answers: [],
         title: typeToDefaultTitle[type]
     })
+    if (type === 'essayAnswerArea') {
+        essayAddAnswer(id, [], 0, 10)
+    } else {
+        defaultAddAnswer(id, [], 0)
+    }
     reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, id)
-    addAnswer(id, [], 0)
 }
 
 export function reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, idOfAnswerArea) {

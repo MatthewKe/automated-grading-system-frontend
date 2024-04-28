@@ -1,9 +1,13 @@
 <script setup>
 import {computed, watch} from "vue";
-import MultipleChoiceAnswerAreaDetails from "@/components/produce/MultipleChoiceAnswerAreaDetails.vue";
+
 import {answerAreaUndefined, getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
 import {Delete} from '@element-plus/icons-vue'
 import {deleteAnswerArea} from "@/components/projectConfig.js";
+import MultipleChoiceAnswerAreaDetails from "@/components/answerAreaDetails/MultipleChoiceAnswerAreaDetails.vue";
+import FillBlanksAnswerAreaDetails from "@/components/answerAreaDetails/FillBlanksAnswerAreaDetails.vue";
+import CalculatingAnswerAreaDetails from "@/components/answerAreaDetails/CalculatingAnswerAreaDetails.vue";
+import EssayAnswerAreaDetails from "@/components/answerAreaDetails/EssayAnswerAreaDetails.vue";
 
 const props = defineProps({
   componentDetailsWidth: Number
@@ -41,9 +45,11 @@ const options = [
 ]
 
 const typeToComponentMap = {
-  'multipleChoiceAnswerArea': MultipleChoiceAnswerAreaDetails
+  'multipleChoiceAnswerArea': MultipleChoiceAnswerAreaDetails,
+  'fillBlanksAnswerArea': FillBlanksAnswerAreaDetails,
+  'calculatingAnswerArea': CalculatingAnswerAreaDetails,
+  'essayAnswerArea': EssayAnswerAreaDetails
 }
-
 
 </script>
 

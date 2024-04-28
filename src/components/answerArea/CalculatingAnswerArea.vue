@@ -1,5 +1,8 @@
 <script setup>
-import {onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
+import {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
+import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
+
 
 const props = defineProps({
   width: Number,
@@ -7,37 +10,78 @@ const props = defineProps({
   areaId: Number
 })
 
+const dpi = 96
+const mmToInch = 25.4
+const pixelPerMm = dpi / mmToInch
+
+const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))
+const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
+const answerAreaTitleHeight = ref(0)
+const answerContainerHeight = computed(() => props.height - answerAreaTitleHeight.value)
+const answerAreaTitle = ref(null)
 
 onMounted(() => {
-  const canvas = document.getElementById(props.areaId).getElementsByTagName('canvas')[0]
-  const ctx = canvas.getContext('2d')
-  ctx.font = '24px Arial'; // 设置字体大小和类型
-  ctx.fillStyle = 'red';   // 设置字体颜色
-  ctx.textAlign = 'center';// 设置文字对齐方式，可选 'left', 'right', 'center', 'start', 'end'
-// 写字
-  ctx.fillText(props.areaId, canvas.width / 2, canvas.height / 2)
+  answerAreaTitleHeight.value = answerAreaTitle.value.$el.clientHeight
 })
 
+let startY
 
+function startResize(event) {
+  console.log('startResize')
+  startY = event.clientY;
+}
+
+const doResize = (event) => {
+  console.log('doResize')
+  const heightDiff = event.clientY - startY;
+  console.log(heightDiff)
+  let scale = 0.3
+  let transform = document.getElementById('container').getElementsByClassName('content')[0].style.transform
+  const regex = /scale\(([^)]+)\)/;
+  const match = transform.match(regex);
+  if (match && match[1]) {
+    scale = parseFloat(match[1]);
+  } else {
+    console.log("No scale value found");
+  }
+  answerArea.value.height += heightDiff / pixelPerMm / scale
+}
 </script>
 
 <template>
-
-  <canvas id="canvas" :width="width" :height="height" :style="{width: width+'px',height:height+'px'}"></canvas>
-
+  <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
+                   :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
+  <div class="flexibleContainer">
+    <div class="answerContainer" :style="{width: width+'px',height:answerContainerHeight+'px'}">
+      <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
+    </div>
+    <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>
+  </div>
 </template>
 
 <style scoped>
-canvas {
+.flexibleContainer {
+  position: relative;
+}
+
+.drag-handle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  height: 20px; /* 拖拽条高度 */
+  background: rgba(0, 51, 255, 0);
+  cursor: ns-resize; /* 北南光标表示可以垂直拖拽 */
+}
+
+.answerContainer {
+  position: relative;
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
-  display: block;
+  padding: 10px;
+  display: flex;
   border: 2px solid #000000;
 }
 
-.draggable {
-  margin: 0;
-  padding: 0;
-}
 </style>
