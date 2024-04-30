@@ -11,6 +11,7 @@ import {provide, ref} from "vue";
 import AnswerAreaDetails from "@/components/answerAreaDetails/AnswerAreaDetails.vue";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
+
 const preSetWidth = 150
 const componentDetailsWidth = 300
 

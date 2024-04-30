@@ -12,7 +12,25 @@
           <router-link to="/grade">批改</router-link>
         </li>
         <li class="right-align">
-          <router-link to="/user">{{ user_state }}</router-link>
+          <div v-if="userState.ifLogin">
+            <el-dropdown>
+              <span class="el-dropdown-link" style="font-size: 16px;color: black">
+                欢迎您，{{ userState.username }}
+                <el-icon class="el-icon--right">
+                  <arrow-down/>
+                </el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="handleLogOut">注销</el-dropdown-item>
+                  <el-dropdown-item>设置</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+          <div v-if="!userState.ifLogin">
+            <router-link to="/login">登录/注册</router-link>
+          </div>
         </li>
       </ul>
     </nav>
@@ -23,13 +41,24 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import userState from "@/userState.js";
+import {ArrowDown} from "@element-plus/icons-vue";
+import router from "@/main.js";
 
-const user_state = ref('登录/注册');
 
+function handleLogOut() {
+  userState.value.ifLogin = false
+  localStorage.removeItem('jwt')
+  router.push('/login')
+}
 </script>
 
 <style>
+a {
+  text-decoration: none;
+  color: black;
+}
+
 #app {
   display: flex;
   flex-direction: column;
@@ -53,15 +82,6 @@ nav li {
   margin-left: auto;
 }
 
-.router-link-active, .router-link-exact-active, a {
-  color: #000;
-  text-decoration: none;
-}
-
-.router-link-active:hover, .router-link-exact-active:hover, a:hover {
-  color: darkslategrey;
-  text-decoration: none;
-}
 
 html, body {
   margin-top: 0;
