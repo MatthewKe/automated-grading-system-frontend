@@ -18,10 +18,9 @@ const componentDetailsWidth = 300
 const zoomContainer = ref()
 
 const resetZoomContainer = () => {
-  if (zoomContainer) {
+  if (zoomContainer && zoomContainer.value) {
     zoomContainer.value.reset()
   }
-  zoomContainer.value.reset()
 }
 
 provide('resetZoomContainer', resetZoomContainer)

@@ -1,4 +1,6 @@
 import {ref, watch} from "vue";
+import http from "@/components/http.js";
+import userState from "@/userState.js";
 
 let projectConfigJson = ref('{}')
 
@@ -7,17 +9,22 @@ watch(projectConfigJson, () => {
     projectConfig.value = JSON.parse(projectConfigJson.value)
 })
 
-fetch('http://localhost:3000/read-file')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();
-    })
-    .then(data => {
-        projectConfigJson.value = data
-    })
-    .catch(error => console.error('There has been a problem with your fetch operation:', error));
+watch(projectConfig, commitProjectConfig, {
+    deep: true
+})
+
+async function commitProjectConfig() {
+    try {
+        const response = await http.post('/produce/commitProject', {
+            projectConfig: JSON.stringify(projectConfig.value),
+            projectId: projectConfig.value.projectId
+        });
+        console.log('commitProjectConfig successful:', response);
+    } catch (error) {
+        console.error('commitProjectConfig failed:', error.response);
+    }
+
+}
 
 export function getAnswerAreaAccordingId(id) {
     return projectConfig.value.answerAreas.find((answerArea) => answerArea.id === Number(id))

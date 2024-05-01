@@ -5,14 +5,12 @@ import AddImg from '@/assets/add.png'
 import {ref} from 'vue'
 import {useRouter} from "vue-router";
 import http from "@/components/http.js";
+import projectConfig from "@/components/projectConfig.js";
 
 
 const papers = ref([])
 const router = useRouter()
 
-function goToProduce(paperID) {
-  router.push({path: '/produce', query: {project_id: paperID}})
-}
 
 try {
   const response = await http.get('/produce/overview');
@@ -21,18 +19,29 @@ try {
     papers.value.push({
       img: LocalImg,
       title: JSON.parse(value).title,
-      id: key
+      projectId: key
     })
   })
 } catch (error) {
   console.error('produce overview failed:', error);
 }
 
+async function goToProduce(projectId) {
+  try {
+    const response = await http.get(`/produce/getProjectConfig?projectId=${projectId}`)
+    console.log('goToProduce successful:', response);
+    projectConfig.value = JSON.parse(response.data.projectConfig)
+    router.push({path: '/produce', query: {project_id: projectId}})
+  } catch (error) {
+    console.error('createProject failed:', error);
+  }
+}
+
 async function createProject() {
   try {
     const response = await http.get('/produce/createProject')
     console.log('createProject successful:', response);
-
+    goToProduce(response.data.id)
   } catch (error) {
     console.error('createProject failed:', error);
   }
@@ -42,7 +51,7 @@ async function createProject() {
 </script>
 
 <template>
-  
+
   <h4>我制作的答题卡</h4>
   <!--  todo 搜索功能-->
   <!--  <SearchBox></SearchBox>-->
@@ -52,7 +61,7 @@ async function createProject() {
       <img class="paper" alt="" v-bind:src="AddImg" id="add" @click="createProject()"/>
     </div>
     <div class="paper-container" v-for="(item,index) in papers">
-      <img class="paper" v-bind:src="item.img" alt="" @click="goToProduce(item.id)"></img>
+      <img class="paper" v-bind:src="item.img" alt="" @click="goToProduce(item.projectId)"></img>
       <p class="paper-name">{{ item.title }}</p>
     </div>
   </div>
