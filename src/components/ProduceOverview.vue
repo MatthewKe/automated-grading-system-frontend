@@ -4,29 +4,56 @@ import LocalImg from '@/assets/sample.png'
 import AddImg from '@/assets/add.png'
 import {ref} from 'vue'
 import {useRouter} from "vue-router";
+import http from "@/components/http.js";
 
-const papers = ref([LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg, LocalImg])
+
+const papers = ref([])
 const router = useRouter()
 
 function goToProduce(paperID) {
-  router.push({path: '/produce', query: {paper_id: paperID}})
+  router.push({path: '/produce', query: {project_id: paperID}})
+}
+
+try {
+  const response = await http.get('/produce/overview');
+  console.log('produce overview successful:', response);
+  Object.entries(response.data.projectConfigs).forEach(([key, value]) => {
+    papers.value.push({
+      img: LocalImg,
+      title: JSON.parse(value).title,
+      id: key
+    })
+  })
+} catch (error) {
+  console.error('produce overview failed:', error);
+}
+
+async function createProject() {
+  try {
+    const response = await http.get('/produce/createProject')
+    console.log('createProject successful:', response);
+
+  } catch (error) {
+    console.error('createProject failed:', error);
+  }
 }
 
 
 </script>
 
 <template>
+  
   <h4>我制作的答题卡</h4>
   <!--  todo 搜索功能-->
   <!--  <SearchBox></SearchBox>-->
 
   <div id="paper-gallery">
     <div class="paper-container">
-      <img class="paper" alt="" v-bind:src="AddImg" id="add" @click="goToProduce(0)"/>
+      <img class="paper" alt="" v-bind:src="AddImg" id="add" @click="createProject()"/>
     </div>
     <div class="paper-container" v-for="(item,index) in papers">
-      <img class="paper" v-bind:src="item" alt="" @click="goToProduce(index)"></img>
-      <p class="paper-name">{{ index }}</p>
+      <img class="paper" v-bind:src="item.img" alt="" @click="goToProduce(item.id)"></img>
+      <p class="paper-name">{{ item.title }}</p>
     </div>
   </div>
 </template>

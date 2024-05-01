@@ -12,7 +12,7 @@ import V3DragZoom from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 import "@/components/v3-drag-zoom/dist/style.css";
 import Register from "@/components/Register.vue";
 import userState from "@/userState.js";
-import http from "@/components/http.js";
+import http, {validateToken} from "@/components/http.js";
 
 const routes = [
     {path: '/', component: Home},
@@ -34,21 +34,6 @@ app.use(V3DragZoom)
 app.use(router)
 app.mount('#app')
 
-// 检查JWT并尝试自动登录
-const token = localStorage.getItem('jwt');
-console.log('validate-token')
-if (token) {
-    console.log('token here')
-    http.get('/user/validate-token')
-        .then((response) => {
-            userState.value.ifLogin = true
-            userState.value.username = response.data.username
-        })
-        .catch(() => {
-            localStorage.removeItem('jwt'); // 如果token无效或过期，清除它
-            userState.isAuthenticated = false;
-        })
-}
 
 export default router;
 

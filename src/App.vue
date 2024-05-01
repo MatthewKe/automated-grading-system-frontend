@@ -34,9 +34,16 @@
         </li>
       </ul>
     </nav>
-    <div id="router-view-container">
-      <router-view/>
-    </div>
+    <Suspense>
+      <template #default>
+        <div id="router-view-container">
+          <router-view/>
+        </div>
+      </template>
+      <template #fallback>
+        <div>Loading...</div>
+      </template>
+    </Suspense>
   </div>
 </template>
 
@@ -44,6 +51,7 @@
 import userState from "@/userState.js";
 import {ArrowDown} from "@element-plus/icons-vue";
 import router from "@/main.js";
+import {validateToken} from "@/components/http.js";
 
 
 function handleLogOut() {
@@ -51,6 +59,9 @@ function handleLogOut() {
   localStorage.removeItem('jwt')
   router.push('/login')
 }
+
+
+validateToken()
 </script>
 
 <style>
@@ -84,10 +95,10 @@ nav li {
 
 
 html, body {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+  margin: 0;
+
+  padding: 0;
+
   height: 100%;
 }
 
