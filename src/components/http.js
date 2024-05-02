@@ -17,20 +17,23 @@ http.interceptors.request.use(function (config) {
     }
     return config
 }, function (error) {
-    return Promise.reject(error);
+    console.error(error)
+    return Promise.reject(error)
 })
 
 
 http.interceptors.response.use(response => response, error => {
-    if (error.response && error.response.status === 401 || error.response.status === 403) {
-        console.error('401 or 403 status')
+    if (error.response && error.response.status === 401) {
+        console.error('401 status')
         userState.value.ifLogin = false;
-        if (router.currentRoute.path !== '/login') {
-            router.push('/login');
-            userState.value.ifLogin = false;
-        }
+        router.push('/login')
+    } else if (error.response && error.response.status === 403) {
+        console.error('403 status')
+        router.push('/')
+    } else {
+        console.log(error)
+        return Promise.reject(error)
     }
-    return Promise.reject(error)
 })
 
 
@@ -49,6 +52,5 @@ export function validateToken() {
             })
     }
 }
-
 
 export default http

@@ -9,6 +9,9 @@ import SheetDetails from "@/components/produce/SheetDetails.vue";
 import detailsInfo from "@/components/detailsOfProduce.js";
 import {provide, ref} from "vue";
 import AnswerAreaDetails from "@/components/answerAreaDetails/AnswerAreaDetails.vue";
+import http from "@/components/http.js";
+import projectConfig from "@/components/projectConfig.js";
+import {useRoute} from "vue-router";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 
@@ -16,6 +19,16 @@ const preSetWidth = 150
 const componentDetailsWidth = 300
 
 const zoomContainer = ref()
+
+const route = useRoute()
+
+try {
+  let response = await http.get(`/produce/getProjectConfig?projectId=${route.query.project_id}`)
+  console.log('goToProduce successful:', response);
+  projectConfig.value = JSON.parse(response.data.projectConfig)
+} catch (error) {
+  console.error('getProjectConfig failed:', error);
+}
 
 const resetZoomContainer = () => {
   if (zoomContainer && zoomContainer.value) {

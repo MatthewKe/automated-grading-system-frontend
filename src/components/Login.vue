@@ -26,10 +26,11 @@
 
 <script setup>
 import {reactive} from 'vue'
-import {ElInput, ElForm, ElFormItem, ElButton, ElRow, ElCol, ElCard} from 'element-plus'
+import {ElButton, ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus'
 import http from "@/components/http.js";
-import {useRouter} from "vue-router";
+
 import userState from "@/userState.js";
+import router from "@/main.js";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 
@@ -37,7 +38,7 @@ const loginForm = reactive({
   username: '',
   password: ''
 })
-const router = useRouter();
+
 
 async function handleLogin() {
   try {
@@ -47,9 +48,26 @@ async function handleLogin() {
     localStorage.setItem('jwt', token);
     userState.value.username = loginForm.username
     userState.value.ifLogin = true
-    router.back()
+    let backStep = 0;
+    let lastPath
+    do {
+      backStep++
+      if (routerHistory.length - backStep >= 0) {
+        lastPath = routerHistory[routerHistory.length - backStep]
+      } else {
+        await router.push('/')
+      }
+    } while (lastPath === '/login' || lastPath === '/register')
+    console.log("goto" + routerHistory[routerHistory.length - backStep])
+    router.go(-backStep + 1)
+
+
   } catch (error) {
     console.error('Login failed:', error.response);
+    ElMessage.error({
+      message: '登陆失败，请检查用户名和密码.',
+      offset: 100
+    })
   }
 
 }

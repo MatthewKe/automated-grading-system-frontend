@@ -11,8 +11,6 @@ import 'element-plus/dist/index.css'
 import V3DragZoom from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 import "@/components/v3-drag-zoom/dist/style.css";
 import Register from "@/components/Register.vue";
-import userState from "@/userState.js";
-import http, {validateToken} from "@/components/http.js";
 
 const routes = [
     {path: '/', component: Home},
@@ -28,12 +26,29 @@ const router = createRouter({
     routes: routes
 })
 
+
+const routerHistory = [];
+router.beforeEach((to, from, next) => {
+    try {
+        console.log('beforeEach')
+        routerHistory.push(to.path);
+        next()
+        return true
+    } catch (e) {
+        console.error('beforeEach error')
+        console.error(e)
+    }
+
+});
+
+window.routerHistory = routerHistory;
+
+
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(V3DragZoom)
 app.use(router)
 app.mount('#app')
-
 
 export default router;
 

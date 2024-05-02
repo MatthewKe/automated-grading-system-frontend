@@ -51,7 +51,6 @@
 import userState from "@/userState.js";
 import {ArrowDown} from "@element-plus/icons-vue";
 import router from "@/main.js";
-import {validateToken} from "@/components/http.js";
 
 
 function handleLogOut() {
@@ -61,7 +60,6 @@ function handleLogOut() {
 }
 
 
-validateToken()
 </script>
 
 <style>

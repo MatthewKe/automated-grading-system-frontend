@@ -4,18 +4,18 @@
       <el-col :span="8">
         <el-card class="box-card">
           <h1>用户注册</h1>
-          <el-form :model="loginForm" @submit.native.prevent="handleLogin" size="large">
-            <h3 style="margin-bottom: 0">用户名</h3>
+          <el-form :model="registerForm" @submit.native.prevent="handleRegister" size="large">
+            <h3 style="margin-bottom: 0">用户名 </h3>
             <el-form-item prop="username">
-              <el-input v-model="loginForm.username" autocomplete="username"></el-input>
+              <el-input v-model="registerForm.username" autocomplete="username"></el-input>
             </el-form-item>
             <h3 style="margin-bottom: 0">密码</h3>
             <el-form-item prop="password">
-              <el-input type="password" v-model="loginForm.password" autocomplete="current-password"></el-input>
+              <el-input type="password" v-model="registerForm.password" autocomplete="current-password"></el-input>
             </el-form-item>
             <h3 style="margin-bottom: 0">再次输入密码</h3>
             <el-form-item>
-              <el-input type="password" v-model="loginForm.password" autocomplete="current-password"></el-input>
+              <el-input type="password" v-model="registerForm.password" autocomplete="current-password"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" native-type="submit" color="#ffd859" style="font-weight: bold">注册</el-button>
@@ -30,25 +30,33 @@
 
 <script setup>
 import {reactive} from 'vue'
-import {ElInput, ElForm, ElFormItem, ElButton, ElRow, ElCol, ElCard} from 'element-plus'
+import {ElButton, ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus'
 import http from "@/components/http.js";
-import {useRouter} from "vue-router";
+import router from "@/main.js";
 
 let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 
-const loginForm = reactive({
+const registerForm = reactive({
   username: '',
   password: ''
 })
-const router = useRouter();
 
-async function handleLogin() {
+
+async function handleRegister() {
   try {
-    const response = await http.post('/user/register', loginForm);
-    console.log('Login successful:', response.data);
-    router.back()
+    const response = await http.post('/user/register', registerForm);
+    console.log('register successful:', response);
+    router.push('/login')
   } catch (error) {
-    console.error('Login failed:', error.response);
+    if (error.response.status === 409) {
+      console.log('409 error')
+      ElMessage.error({
+        message: '抱歉，该用户名已经被注册.',
+        offset: 100
+      })
+    } else {
+      return Promise.reject(error)
+    }
   }
 
 }

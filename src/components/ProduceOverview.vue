@@ -3,25 +3,26 @@
 import LocalImg from '@/assets/sample.png'
 import AddImg from '@/assets/add.png'
 import {ref} from 'vue'
-import {useRouter} from "vue-router";
 import http from "@/components/http.js";
 import projectConfig from "@/components/projectConfig.js";
+import router from "@/main.js";
 
 
 const papers = ref([])
-const router = useRouter()
 
 
 try {
   const response = await http.get('/produce/overview');
   console.log('produce overview successful:', response);
   Object.entries(response.data.projectConfigs).forEach(([key, value]) => {
+    console.log()
     papers.value.push({
       img: LocalImg,
       title: JSON.parse(value).title,
       projectId: key
     })
   })
+  console.log(papers)
 } catch (error) {
   console.error('produce overview failed:', error);
 }
@@ -33,7 +34,7 @@ async function goToProduce(projectId) {
     projectConfig.value = JSON.parse(response.data.projectConfig)
     router.push({path: '/produce', query: {project_id: projectId}})
   } catch (error) {
-    console.error('createProject failed:', error);
+    console.error('goToProduce failed:', error);
   }
 }
 

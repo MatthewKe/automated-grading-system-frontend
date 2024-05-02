@@ -1,11 +1,6 @@
 <script setup>
 import {computed, onMounted} from "vue";
-import projectConfig, {
-  getAnswerAreaAccordingId,
-  getAnswerAreaIndex,
-  getPreQuestionNumber,
-  incrementAfterIndex4answers
-} from "@/components/projectConfig.js";
+import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
