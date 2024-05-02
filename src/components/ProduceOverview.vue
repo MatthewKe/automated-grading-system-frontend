@@ -3,7 +3,7 @@
 import LocalImg from '@/assets/sample.png'
 import AddImg from '@/assets/add.png'
 import {ref} from 'vue'
-import http from "@/components/http.js";
+import http, {validateToken} from "@/components/http.js";
 import projectConfig from "@/components/projectConfig.js";
 import router from "@/main.js";
 
@@ -12,6 +12,7 @@ const papers = ref([])
 
 
 try {
+  validateToken()
   const response = await http.get('/produce/overview');
   console.log('produce overview successful:', response);
   Object.entries(response.data.projectConfigs).forEach(([key, value]) => {
@@ -40,7 +41,7 @@ async function goToProduce(projectId) {
 
 async function createProject() {
   try {
-    const response = await http.get('/produce/createProject')
+    const response = await http.get(`/produce/createProject?timestamp=${Date.now()}`)
     console.log('createProject successful:', response);
     goToProduce(response.data.id)
   } catch (error) {

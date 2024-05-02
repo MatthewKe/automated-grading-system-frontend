@@ -1,5 +1,6 @@
 import {ref, watch} from "vue";
 import http from "@/components/http.js";
+import {cloneDeep, isEqual, differenceWith, throttle} from 'lodash';
 
 let projectConfigJson = ref('{}')
 
@@ -8,15 +9,18 @@ watch(projectConfigJson, () => {
     projectConfig.value = JSON.parse(projectConfigJson.value)
 })
 
-watch(projectConfig, commitProjectConfig, {
+const throttledCommit = throttle(commitProjectConfig, 200);
+watch(projectConfig, throttledCommit, {
     deep: true
 })
+
 
 async function commitProjectConfig() {
     try {
         const response = await http.post('/produce/commitProject', {
             projectConfig: JSON.stringify(projectConfig.value),
-            projectId: projectConfig.value.projectId
+            projectId: projectConfig.value.projectId,
+            timestamp: Date.now()
         });
         console.log('commitProjectConfig successful:', response);
     } catch (error) {
