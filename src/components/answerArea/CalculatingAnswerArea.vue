@@ -32,9 +32,7 @@ function startResize(event) {
 }
 
 const doResize = (event) => {
-  console.log('doResize')
   const heightDiff = event.clientY - startY;
-  console.log(heightDiff)
   let scale = 0.3
   let transform = document.getElementById('container').getElementsByClassName('content')[0].style.transform
   const regex = /scale\(([^)]+)\)/;

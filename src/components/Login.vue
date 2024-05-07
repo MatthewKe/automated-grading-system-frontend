@@ -7,14 +7,17 @@
           <el-form :model="loginForm" @submit.native.prevent="handleLogin" size="large">
             <h3 style="margin-bottom: 0">用户名</h3>
             <el-form-item prop="username">
-              <el-input v-model="loginForm.username" autocomplete="username"></el-input>
+              <el-input id="username" v-model="loginForm.username" autocomplete="username"></el-input>
             </el-form-item>
             <h3 style="margin-bottom: 0">密码</h3>
             <el-form-item prop="password">
-              <el-input type="password" v-model="loginForm.password" autocomplete="current-password"></el-input>
+              <el-input id="password" type="password" v-model="loginForm.password"
+                        autocomplete="current-password"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" native-type="submit" color="#ffd859" style="font-weight: bold">登录</el-button>
+              <el-button id="login-button" type="primary" native-type="submit" color="#ffd859"
+                         style="font-weight: bold">登录
+              </el-button>
               <el-button @click="$router.push('/register')" style="font-weight: bold">注册</el-button>
             </el-form-item>
           </el-form>
@@ -58,10 +61,7 @@ async function handleLogin() {
         await router.push('/')
       }
     } while (lastPath === '/login' || lastPath === '/register')
-    console.log("goto" + routerHistory[routerHistory.length - backStep])
     router.go(-backStep + 1)
-
-
   } catch (error) {
     console.error('Login failed:', error.response);
     ElMessage.error({

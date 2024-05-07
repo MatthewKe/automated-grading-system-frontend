@@ -1,8 +1,6 @@
 <script setup>
 
-import {validateToken} from "@/components/http.js";
 
-validateToken()
 </script>
 
 <template>

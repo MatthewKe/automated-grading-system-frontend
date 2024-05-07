@@ -30,12 +30,10 @@ const router = createRouter({
 const routerHistory = [];
 router.beforeEach((to, from, next) => {
     try {
-        console.log('beforeEach')
         routerHistory.push(to.path);
         next()
         return true
     } catch (e) {
-        console.error('beforeEach error')
         console.error(e)
     }
 

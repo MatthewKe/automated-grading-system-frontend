@@ -1,21 +1,35 @@
 import {ref, watch} from "vue";
 import http from "@/components/http.js";
-import {cloneDeep, isEqual, differenceWith, throttle} from 'lodash';
-
-let projectConfigJson = ref('{}')
+import {throttle} from 'lodash';
+import domtoimage from "dom-to-image";
 
 const projectConfig = ref({})
-watch(projectConfigJson, () => {
-    projectConfig.value = JSON.parse(projectConfigJson.value)
-})
 
-const throttledCommit = throttle(commitProjectConfig, 200);
-watch(projectConfig, throttledCommit, {
+const throttledCommit = throttle(commitProjectConfig, 2000);
+watch([() => projectConfig.value.title, () => projectConfig.value.sheets, () => projectConfig.value.answerAreas], throttledCommit, {
+    deep: true
+})
+watch(() => projectConfig.value.title, () => {
+    console.log('title change')
+}, {
+    deep: true
+})
+watch(() => projectConfig.value.sheets, () => {
+    console.log('sheets change')
+}, {
+    deep: true
+})
+watch(() => projectConfig.value.answerAreas, () => {
+    console.log('answerAreas change')
+}, {
     deep: true
 })
 
-
 async function commitProjectConfig() {
+    let thumbnail = await getThumbnail();
+    if (thumbnail !== null) {
+        projectConfig.value.thumbnail = thumbnail;
+    }
     try {
         const response = await http.post('/produce/commitProject', {
             projectConfig: JSON.stringify(projectConfig.value),
@@ -26,7 +40,20 @@ async function commitProjectConfig() {
     } catch (error) {
         console.error('commitProjectConfig failed:', error.response);
     }
+}
 
+async function getThumbnail() {
+    try {
+        let node = document.querySelector("#sheetContainer")?.children[0];
+        if (node === undefined) {
+            return null;
+        }
+        let dataUrl = await domtoimage.toPng(node);
+        return dataUrl;
+    } catch (error) {
+        console.error('Failed to generate thumbnail:', error);
+        return null;
+    }
 }
 
 export function getAnswerAreaAccordingId(id) {
@@ -112,7 +139,6 @@ export function deleteAnswerArea(answerAreaId) {
 
 
 export function defaultAddAnswer(answerAreaId, correctAnswer, score) {
-    console.log('defaultAddAnswer')
     let answerArea = getAnswerAreaAccordingId(answerAreaId)
     let answers = answerArea.answers
     let nextQuestionNumber

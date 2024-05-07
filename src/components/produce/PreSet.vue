@@ -6,6 +6,8 @@ import OtherAnswerAreaInPreSet from "@/components/answerArea/OtherAnswerAreaInPr
 import EssayAnswerAreaInPreSet from "@/components/answerArea/EssayAnswerAreaInPreSet.vue";
 import FillBlanksAnswerAreaInPreSet from "@/components/answerArea/FillBlanksAnswerAreaInPreSet.vue";
 import MultipleChoiceAnswerAreaInPreSet from "@/components/answerArea/MultipleChoiceAnswerAreaInPreSet.vue";
+import http from "@/components/http.js";
+import {useRoute} from "vue-router";
 
 const props = defineProps({
   preSetWidth: Number
@@ -19,6 +21,49 @@ const answerAreaInPreSetArr = [
   FillBlanksAnswerAreaInPreSet,
   CalculatingAnswerAreaInPreSet, EssayAnswerAreaInPreSet, OtherAnswerAreaInPreSet
 ]
+
+function printDiv() {
+  let content = document.getElementById('sheetContainer').innerHTML;
+  let iframe = document.createElement('iframe');
+  iframe.style.visibility = 'hidden';
+  iframe.style.position = 'absolute';
+  iframe.style.left = '-9999px';
+  document.body.appendChild(iframe);
+
+  iframe.contentWindow.document.open();
+  iframe.contentWindow.document.write('<html><head><title>打印预览</title></head><body>');
+  iframe.contentWindow.document.write(content);
+  iframe.contentWindow.document.write('</body></html>');
+  iframe.contentWindow.document.close();
+
+  iframe.contentWindow.focus();
+  iframe.contentWindow.print();
+  document.body.removeChild(iframe);
+}
+
+const route = useRoute()
+
+async function downloadPDF() {
+  try {
+    const response = await http.get(`/produce/download?projectId=${route.query.project_id}`, {
+      responseType: 'arraybuffer'
+    });
+    console.log('downloadPDF successful:', response);
+
+    const url = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'example.pdf');  // 指定下载文件名
+    document.body.appendChild(link);
+    link.click();  // 触发下载
+    window.URL.revokeObjectURL(url);  // 清理生成的URL
+    link.parentNode.removeChild(link);
+  } catch (error) {
+    console.error('Download failed:', error.response);
+  }
+}
+
+
 </script>
 
 
@@ -30,6 +75,7 @@ const answerAreaInPreSetArr = [
                :height="componentHeight"
                :width="componentWidth"></component>
 
+    <el-button type="primary" @click="downloadPDF">保存为PDF</el-button>
 
   </div>
 

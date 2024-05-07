@@ -30,6 +30,10 @@ http.interceptors.response.use(response => response, error => {
     } else if (error.response && error.response.status === 403) {
         console.error('403 status')
         router.push('/')
+    } else if (error.code === "ERR_NETWORK") {
+        console.error('网络问题')
+        //todo 网络问题页面
+        router.push('/')
     } else {
         console.log(error)
         return Promise.reject(error)
@@ -38,7 +42,7 @@ http.interceptors.response.use(response => response, error => {
 
 
 export function validateToken() {
-    console.log('validateToken')
+
     const token = localStorage.getItem('jwt');
     if (token) {
         http.get('/user/validate-token')
