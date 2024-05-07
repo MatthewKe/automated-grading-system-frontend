@@ -53,7 +53,7 @@ async function createProject() {
 
 <template>
 
-  <h4>我制作的答题卡</h4>
+  <h4 style="margin: 20px">我制作的答题卡</h4>
   <!--  todo 搜索功能-->
   <!--  <SearchBox></SearchBox>-->
 
@@ -73,7 +73,7 @@ async function createProject() {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 50px;
+  margin: 20px;
 }
 
 .paper {

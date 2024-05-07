@@ -4,7 +4,6 @@ import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/com
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
-  width: Number,
   height: Number,
   areaId: Number
 })
@@ -35,7 +34,6 @@ const pixelPerMm = dpi / mmToInch
 
 const defaultFontWidth = projectConfig.value.defaultFontWidth
 const defaultFontWidthPx = defaultFontWidth * pixelPerMm
-const defaultClientAnswerWidthPx = 4 * defaultFontWidthPx
 const defaultClientAnswerHeightPx = 2 * defaultFontWidthPx
 const clientAnswerStyle = {
   height: defaultClientAnswerHeightPx + 'px'
@@ -46,7 +44,7 @@ const clientAnswerStyle = {
 <template>
   <AnswerAreaTitle :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
-  <div class="answerContainer" :style="{width: width+'px'}">
+  <div class="answerContainer">
     <div style="display: flex;width: 100%;align-items: flex-end">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
       <div class="clientAnswer" style="border-bottom: 1px solid black;width: 100%"

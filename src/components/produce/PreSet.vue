@@ -1,6 +1,6 @@
 <script setup>
 
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import CalculatingAnswerAreaInPreSet from "@/components/answerArea/CalculatingAnswerAreaInPreSet.vue";
 import OtherAnswerAreaInPreSet from "@/components/answerArea/OtherAnswerAreaInPreSet.vue";
 import EssayAnswerAreaInPreSet from "@/components/answerArea/EssayAnswerAreaInPreSet.vue";
@@ -43,19 +43,22 @@ function printDiv() {
 
 const route = useRoute()
 
+const fullscreenLoading = ref(false)
+
 async function downloadPDF() {
   try {
+    fullscreenLoading.value = true;
     const response = await http.get(`/produce/download?projectId=${route.query.project_id}`, {
       responseType: 'arraybuffer'
     });
     console.log('downloadPDF successful:', response);
-
     const url = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}));
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'example.pdf');  // 指定下载文件名
     document.body.appendChild(link);
     link.click();  // 触发下载
+    fullscreenLoading.value = false;
     window.URL.revokeObjectURL(url);  // 清理生成的URL
     link.parentNode.removeChild(link);
   } catch (error) {
@@ -75,7 +78,7 @@ async function downloadPDF() {
                :height="componentHeight"
                :width="componentWidth"></component>
 
-    <el-button type="primary" @click="downloadPDF">保存为PDF</el-button>
+    <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary" @click="downloadPDF">保存为PDF</el-button>
 
   </div>
 

@@ -5,7 +5,6 @@ import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
 
 const props = defineProps({
-  width: Number,
   height: Number,
   areaId: Number
 })
@@ -49,7 +48,7 @@ const doResize = (event) => {
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer" :style="{width: width+'px',height:answerContainerHeight+'px'}">
+    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>

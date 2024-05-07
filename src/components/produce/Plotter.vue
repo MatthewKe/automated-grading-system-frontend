@@ -8,6 +8,7 @@ import MultipleChoiceAnswerArea from "@/components/answerArea/MultipleChoiceAnsw
 import EssayAnswerArea from "@/components/answerArea/EssayAnswerArea.vue";
 import FillBlanksAnswerArea from "@/components/answerArea/FillBlanksAnswerArea.vue";
 import {setClickEvent} from "@/components/clickState.js";
+import {throttle} from "lodash";
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -59,14 +60,11 @@ const gapBetweenAnswerAreaPx = computed(() => projectConfig.value.gapBetweenAnsw
 
 let answerAreaContainers = ref([])
 
-watch(projectConfig, () => {
-  try {
-    answerAreaContainers.value = updateAnswerAreaContainers()
-  } catch (e) {
-    //todo projectConfig的初始化
-    console.log(e)
-  }
-}, {
+const throttledFunc = throttle(() => {
+  answerAreaContainers.value = updateAnswerAreaContainers()
+}, 50);
+
+watch(projectConfig, throttledFunc, {
   immediate: true,
   deep: true
 })
@@ -90,22 +88,22 @@ function updateAnswerAreaContainers() {
   let answerAreas = projectConfig.value.answerAreas
 
   //计算填充answerAreaContainers
-  let i = 0
-  let j = 0
+  let indexOfSheets = 0
+  let indexOfAnswerAreaContainers = 0
   let heightLeftPx = heightOfAnswerAreaContainerPx.value - sizeOfInfoAreaPx.value
 
   for (let answerArea of answerAreas) {
     let answerAreaHeightPx = answerArea.height * pixelPerMm
     if (heightLeftPx < answerAreaHeightPx + gapBetweenAnswerAreaPx.value) {
-      j++
+      indexOfAnswerAreaContainers++
       heightLeftPx = heightOfAnswerAreaContainerPx.value
     }
-    if (j >= sheets.value[i].numOfAnswerAreaContainers) {
-      i++
-      j = 0
+    if (indexOfAnswerAreaContainers >= sheets.value[indexOfSheets].numOfAnswerAreaContainers) {
+      indexOfSheets++
+      indexOfAnswerAreaContainers = 0
       heightLeftPx = heightLeftPx - sizeOfInfoAreaPx.value
     }
-    if (i >= projectConfig.value.sheets.length) {
+    if (indexOfSheets >= projectConfig.value.sheets.length) {
       //需要新增一个sheet
       projectConfig.value.sheets.push({
         "numOfAnswerAreaContainers": 3
@@ -113,15 +111,15 @@ function updateAnswerAreaContainers() {
       return answerAreaContainers
     }
 
-    let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[i].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[i].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
+    let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[indexOfSheets].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[indexOfSheets].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
     answerArea.width = answerAreaWidthPx / pixelPerMm
 
-    answerAreaContainers[i][j].push(
+    answerAreaContainers[indexOfSheets][indexOfAnswerAreaContainers].push(
         {
           id: answerArea.id,
           type: answerArea.type,
           height: answerAreaHeightPx,
-          width: answerAreaWidthPx
+          // width: answerAreaWidthPx
         })
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
@@ -233,7 +231,6 @@ onMounted(() => {
                      :size-of-info-area-px="sizeOfInfoAreaPx" :id="`infoArea-${i}`"></info-area>
           <component :is="getAnswerArea(answerArea.type)"
                      :height="answerArea.height"
-                     :width="answerArea.width"
                      :area-id="answerArea.id"
           ></component>
         </div>
@@ -244,13 +241,11 @@ onMounted(() => {
 
 <style>
 
-
 #sheetContainer {
   display: flex;
   flex-direction: column;
   gap: 20px
 }
-
 
 .sheet {
   background: white;
@@ -265,6 +260,5 @@ onMounted(() => {
   flex-direction: column;
   flex: 1;
 }
-
 
 </style>
