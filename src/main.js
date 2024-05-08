@@ -12,6 +12,7 @@ import V3DragZoom from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
 import "@/components/v3-drag-zoom/dist/style.css";
 import Register from "@/components/Register.vue";
 
+
 const routes = [
     {path: '/', component: Home},
     {path: '/produce_overview', component: ProduceOverview},

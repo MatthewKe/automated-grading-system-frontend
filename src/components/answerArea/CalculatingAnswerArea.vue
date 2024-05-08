@@ -1,12 +1,15 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
 import {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-
+import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 const props = defineProps({
   height: Number,
-  areaId: Number
+  areaId: Number,
+  indexOfSheets: Number,
+  indexOfAnswerAreaContainers: Number,
+  sheetContainer: Object
 })
 
 const dpi = 96
@@ -18,6 +21,13 @@ const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
 const answerAreaTitleHeight = ref(0)
 const answerContainerHeight = computed(() => props.height - answerAreaTitleHeight.value)
 const answerAreaTitle = ref(null)
+
+let observer
+watch(() => props.sheetContainer, () => {
+  console.log(props.sheetContainer); // 检查 ref 是否更新
+  observer = uploadCoordinate(observedElement.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
+});
+
 
 onMounted(() => {
   answerAreaTitleHeight.value = answerAreaTitle.value.$el.clientHeight
@@ -43,13 +53,17 @@ const doResize = (event) => {
   }
   answerArea.value.height += heightDiff / pixelPerMm / scale
 }
+
+const observedElement = ref(null);
+
+
 </script>
 
 <template>
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}">
+    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}" ref="observedElement">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>

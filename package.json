@@ -15,7 +15,9 @@
     "element-plus": "^2.6.3",
     "html2canvas": "^1.4.1",
     "lodash": "^4.17.21",
+    "qrcode-svg": "^1.1.0",
     "vue": "^3.4.21",
+    "vue-resize-directive": "^1.2.0",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {

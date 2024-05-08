@@ -60,6 +60,7 @@ const gapBetweenAnswerAreaPx = computed(() => projectConfig.value.gapBetweenAnsw
 
 let answerAreaContainers = ref([])
 
+
 const throttledFunc = throttle(() => {
   answerAreaContainers.value = updateAnswerAreaContainers()
 }, 50);
@@ -69,7 +70,9 @@ watch(projectConfig, throttledFunc, {
   deep: true
 })
 
+
 function updateAnswerAreaContainers() {
+  console.log('updateAnswerAreaContainers')
   //生成answerAreaContainers，并且预装info-area
   let answerAreaContainers = []
   let numOfSheets = projectConfig.value.sheets.length
@@ -113,7 +116,8 @@ function updateAnswerAreaContainers() {
 
     let answerAreaWidthPx = (widthOfSheetPx.value - (projectConfig.value.sheets[indexOfSheets].numOfAnswerAreaContainers - 1) * gapBetweenAnswerAreaContainerPx.value) / projectConfig.value.sheets[indexOfSheets].numOfAnswerAreaContainers - 2 * answerAreaContainerPaddingPx.value
     answerArea.width = answerAreaWidthPx / pixelPerMm
-
+    answerArea.indexOfSheets = indexOfSheets
+    answerArea.indexOfAnswerAreaContainers = indexOfAnswerAreaContainers
     answerAreaContainers[indexOfSheets][indexOfAnswerAreaContainers].push(
         {
           id: answerArea.id,
@@ -159,7 +163,7 @@ function handleDrop(event) {
 
 
 function getAnswerAreaContainer(i, j) {
-  return answerAreaContainers.value[i] && answerAreaContainers.value[i][j - 1] ? answerAreaContainers.value[i][j - 1] : []
+  return answerAreaContainers.value[i] && answerAreaContainers.value[i][j] ? answerAreaContainers.value[i][j] : []
 }
 
 function getAnswerArea(type) {
@@ -213,13 +217,13 @@ onMounted(() => {
          :style="{ width: widthOfSheetPx + 'px', height: heightOfSheetPx + 'px', padding: sheetsPaddingPx + 'px'
          , gap:gapBetweenAnswerAreaContainerPx+'px'}"
          @click="handleSheetClick">
-      <div v-for="j in sheet.numOfAnswerAreaContainers" :key="j" class="answerAreaContainer"
+      <div v-for="j in sheet.numOfAnswerAreaContainers" :key="j-1" class="answerAreaContainer"
            :style="{gap: gapBetweenAnswerAreaPx+'px',padding:answerAreaContainerPaddingPx+'px'}"
            @dragover.prevent
            @drop="handleDrop"
       >
         <div
-            v-for="(answerArea) in getAnswerAreaContainer(i,j)"
+            v-for="(answerArea) in getAnswerAreaContainer(i,j-1)"
             :key="answerArea.id"
             :id="answerArea.id != null ? answerArea.id : `infoArea-${i}`"
             :class="answerArea.type"
@@ -227,18 +231,21 @@ onMounted(() => {
             @dragstart="startDrag"
             @dragend="endDrag"
             @click.stop="handleAnswerAreaClick">
-          <info-area v-if="answerArea.type==='infoArea'" :title="title"
+          <info-area v-if="answerArea.type==='infoArea'" :title="title" :index-of-sheets="i"
+                     :project-id="projectConfig.projectId"
                      :size-of-info-area-px="sizeOfInfoAreaPx" :id="`infoArea-${i}`"></info-area>
           <component :is="getAnswerArea(answerArea.type)"
                      :height="answerArea.height"
                      :area-id="answerArea.id"
+                     :indexOfSheets="i"
+                     :indexOfAnswerAreaContainers="j-1"
+                     :sheetContainer="sheetContainer"
           ></component>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <style>
 
 #sheetContainer {
@@ -254,7 +261,7 @@ onMounted(() => {
 }
 
 .answerAreaContainer {
-  border-radius: 20px;
+
   border: 2.4px solid black;
   display: flex;
   flex-direction: column;

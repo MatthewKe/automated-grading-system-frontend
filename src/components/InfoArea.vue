@@ -1,32 +1,40 @@
 <script setup>
-import {computed} from "vue";
+import {computed, onMounted, ref} from "vue";
+import QRCodeSVG from 'qrcode-svg';
 
 const props = defineProps({
   sizeOfInfoAreaPx: Number,
-  title: String
+  title: String,
+  indexOfSheets: Number,
+  projectId: Number
 })
 
 const sizeOfBarcodePx = 127
-
-const barcodeStyle = computed(() => ({
-  maxHeight: `${sizeOfBarcodePx}px`,
-  minHeight: `${sizeOfBarcodePx}px`,
-  minWidth: `${sizeOfBarcodePx}px`,
-  maxWidth: `${sizeOfBarcodePx}px`,
-  flexBasis: `${sizeOfBarcodePx}px`
-}))
 
 const infoAreaStyle = computed(() => ({
   maxHeight: `${props.sizeOfInfoAreaPx}px`,
   minHeight: `${props.sizeOfInfoAreaPx}px`,
 }))
 
+const qrSVG = ref('');
+
+onMounted(() => {
+  const qr = new QRCodeSVG({
+    content: props.projectId + '-' + props.indexOfSheets,
+    padding: 2,
+    width: sizeOfBarcodePx,
+    height: sizeOfBarcodePx,
+    color: "#000000",
+    background: "#ffffff"
+  });
+  qrSVG.value = qr.svg();
+});
 </script>
 
 <template>
   <div class="info-area" :style="infoAreaStyle">
     <div style="display: flex;">
-      <div class="barcode" :style="barcodeStyle"></div>
+      <div v-html="qrSVG"></div>
       <div class="title">
         <h1 style="text-align: center">{{ title }}</h1>
       </div>

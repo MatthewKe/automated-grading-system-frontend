@@ -3,10 +3,12 @@ import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
-
 const props = defineProps({
   height: Number,
-  areaId: Number
+  areaId: Number,
+  indexOfSheets: Number,
+  indexOfAnswerAreaContainers: Number,
+  sheetContainer: Object
 })
 
 const dpi = 96

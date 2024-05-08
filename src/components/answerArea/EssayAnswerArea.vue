@@ -5,7 +5,10 @@ import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
   height: Number,
-  areaId: Number
+  areaId: Number,
+  indexOfSheets: Number,
+  indexOfAnswerAreaContainers: Number,
+  sheetContainer: Object
 })
 
 const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))

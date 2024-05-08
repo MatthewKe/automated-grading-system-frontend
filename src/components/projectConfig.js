@@ -5,7 +5,7 @@ import domtoimage from "dom-to-image";
 
 const projectConfig = ref({})
 
-const throttledCommit = throttle(commitProjectConfig, 2000);
+const throttledCommit = throttle(commitProjectConfig, 5000);
 watch([() => projectConfig.value.title, () => projectConfig.value.sheets, () => projectConfig.value.answerAreas], throttledCommit, {
     deep: true
 })
