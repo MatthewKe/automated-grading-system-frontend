@@ -1,7 +1,8 @@
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
+import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 const props = defineProps({
   height: Number,
@@ -13,6 +14,12 @@ const props = defineProps({
 
 const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))
 const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
+
+const answerContainer = ref(null);
+watch(() => props.sheetContainer, () => {
+  console.log('essayAnswerArea props.sheetContainer change')
+  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
+});
 
 const updateHeight = (entries) => {
   for (const entry of entries) {
@@ -47,7 +54,7 @@ const clientAnswerStyle = {
 <template>
   <AnswerAreaTitle :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
-  <div class="answerContainer">
+  <div class="answerContainer" ref="answerContainer">
     <div style="display: flex;width: 100%;align-items: flex-end">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
       <div class="clientAnswer" style="border-bottom: 1px solid black;width: 100%"

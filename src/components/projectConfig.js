@@ -56,6 +56,18 @@ async function getThumbnail() {
     }
 }
 
+export function getAnswer(questionNumber) {
+    const questionNumberN = Number(questionNumber)
+    for (const answerArea of projectConfig.value.answerAreas) {
+        for (const answer of answerArea.answers) {
+            if (Number(answer.questionNumber) === questionNumberN) {
+                return answer
+            }
+        }
+    }
+    return null
+}
+
 export function getAnswerAreaAccordingId(id) {
     return projectConfig.value.answerAreas.find((answerArea) => answerArea.id === Number(id))
 }

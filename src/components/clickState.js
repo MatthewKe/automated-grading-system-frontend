@@ -8,8 +8,6 @@ const clickEvent = ref(
 )
 
 function setClickEvent(targetType, targetId) {
-    console.log(targetType)
-    console.log(targetId)
     clickEvent.value.targetType = targetType
     clickEvent.value.targetId = targetId
 }

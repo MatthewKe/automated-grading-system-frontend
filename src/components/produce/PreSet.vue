@@ -22,24 +22,6 @@ const answerAreaInPreSetArr = [
   CalculatingAnswerAreaInPreSet, EssayAnswerAreaInPreSet, OtherAnswerAreaInPreSet
 ]
 
-function printDiv() {
-  let content = document.getElementById('sheetContainer').innerHTML;
-  let iframe = document.createElement('iframe');
-  iframe.style.visibility = 'hidden';
-  iframe.style.position = 'absolute';
-  iframe.style.left = '-9999px';
-  document.body.appendChild(iframe);
-
-  iframe.contentWindow.document.open();
-  iframe.contentWindow.document.write('<html><head><title>打印预览</title></head><body>');
-  iframe.contentWindow.document.write(content);
-  iframe.contentWindow.document.write('</body></html>');
-  iframe.contentWindow.document.close();
-
-  iframe.contentWindow.focus();
-  iframe.contentWindow.print();
-  document.body.removeChild(iframe);
-}
 
 const route = useRoute()
 

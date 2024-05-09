@@ -22,10 +22,9 @@ const answerAreaTitleHeight = ref(0)
 const answerContainerHeight = computed(() => props.height - answerAreaTitleHeight.value)
 const answerAreaTitle = ref(null)
 
-let observer
+const answerContainer = ref(null);
 watch(() => props.sheetContainer, () => {
-  console.log(props.sheetContainer); // 检查 ref 是否更新
-  observer = uploadCoordinate(observedElement.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
+  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
 });
 
 
@@ -54,8 +53,6 @@ const doResize = (event) => {
   answerArea.value.height += heightDiff / pixelPerMm / scale
 }
 
-const observedElement = ref(null);
-
 
 </script>
 
@@ -63,7 +60,7 @@ const observedElement = ref(null);
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}" ref="observedElement">
+    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}" ref="answerContainer">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>

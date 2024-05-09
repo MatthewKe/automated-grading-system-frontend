@@ -1,7 +1,8 @@
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
+import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 
 const props = defineProps({
@@ -12,13 +13,19 @@ const props = defineProps({
   sheetContainer: Object
 })
 
+const answerContainer = ref(null);
+watch(() => props.sheetContainer, () => {
+  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
+});
+
+
 const dpi = 96
 const mmToInch = 25.4
 const pixelPerMm = dpi / mmToInch
 
 const defaultFontWidth = projectConfig.value.defaultFontWidth
 const defaultFontWidthPx = defaultFontWidth * pixelPerMm
-const defaultClientAnswerWidthPx = 4 * defaultFontWidthPx
+const defaultClientAnswerWidthPx = 3 * defaultFontWidthPx
 const defaultClientAnswerHeightPx = 2 * defaultFontWidthPx
 const clientAnswerStyle = {
   width: defaultClientAnswerWidthPx + 'px',
@@ -49,7 +56,7 @@ onMounted(() => {
 
 <template>
   <AnswerAreaTitle :title-ctx="answerArea.title" :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
-  <div class="answerContainer">
+  <div class="answerContainer" ref="answerContainer">
     <div v-for="answer in answerArea.answers" class="subQuestion">
       <div class="questionNumber" style="font-size: 30px">{{ answer.questionNumber }}</div>
       <div class="clientAnswer" style="border-bottom: 1px solid black"
@@ -62,11 +69,16 @@ onMounted(() => {
 .answerContainer {
   box-sizing: border-box;
   margin: 0;
-  padding: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
   display: flex;
   border: 2px solid #000000;
   flex-wrap: wrap;
   justify-content: space-between
+}
+
+.clientAnswer {
+  padding: 10px;
 }
 
 .questionNumber {
