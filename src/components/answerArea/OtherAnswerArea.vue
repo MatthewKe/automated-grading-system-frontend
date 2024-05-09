@@ -1,8 +1,7 @@
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 
 const props = defineProps({
@@ -12,12 +11,6 @@ const props = defineProps({
   indexOfAnswerAreaContainers: Number,
   sheetContainer: Object
 })
-
-const answerContainer = ref(null);
-watch(() => props.sheetContainer, () => {
-  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
-});
-
 
 const dpi = 96
 const mmToInch = 25.4
@@ -58,7 +51,8 @@ const doResize = (event) => {
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}" ref="answerContainer">
+    <div class="answerContainer  clientAnswer" :question-number="answerArea.answers[0].questionNumber"
+         :style="{height:answerContainerHeight+'px'}">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>

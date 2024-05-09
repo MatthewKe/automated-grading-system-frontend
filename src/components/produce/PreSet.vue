@@ -8,6 +8,7 @@ import FillBlanksAnswerAreaInPreSet from "@/components/answerArea/FillBlanksAnsw
 import MultipleChoiceAnswerAreaInPreSet from "@/components/answerArea/MultipleChoiceAnswerAreaInPreSet.vue";
 import http from "@/components/http.js";
 import {useRoute} from "vue-router";
+import downloadPDFState from "@/components/produce/downloadPDF.js";
 
 const props = defineProps({
   preSetWidth: Number
@@ -48,6 +49,16 @@ async function downloadPDF() {
   }
 }
 
+function getCoordinate() {
+
+}
+
+function clickDownload() {
+  //计量各个组件的坐标并commit
+  downloadPDFState.value = true
+  downloadPDF()
+}
+
 
 </script>
 
@@ -60,7 +71,8 @@ async function downloadPDF() {
                :height="componentHeight"
                :width="componentWidth"></component>
 
-    <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary" @click="downloadPDF">保存为PDF</el-button>
+    <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary" @click="clickDownload">导出答题卡PDF
+    </el-button>
 
   </div>
 

@@ -1,8 +1,7 @@
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 const props = defineProps({
   height: Number,
@@ -11,11 +10,6 @@ const props = defineProps({
   indexOfAnswerAreaContainers: Number,
   sheetContainer: Object
 })
-
-const answerContainer = ref(null);
-watch(() => props.sheetContainer, () => {
-  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
-});
 
 
 const dpi = 96
@@ -55,11 +49,11 @@ onMounted(() => {
 
 <template>
   <AnswerAreaTitle :title-ctx="answerArea.title" :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
-  <div class="answerContainer" ref="answerContainer">
+  <div class="answerContainer">
     <div v-for="answer in answerArea.answers" class="subQuestion">
       <div class="questionNumber" style="font-size: 30px">{{ answer.questionNumber }}</div>
       <div class="clientAnswer" style="border-bottom: 1px solid black"
-           :style="clientAnswerStyle" :questionNumber="answer.questionNumber"></div>
+           :style="clientAnswerStyle" :question-number="answer.questionNumber"></div>
     </div>
   </div>
 </template>

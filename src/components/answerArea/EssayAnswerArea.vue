@@ -1,8 +1,7 @@
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 const props = defineProps({
   height: Number,
@@ -15,11 +14,6 @@ const props = defineProps({
 const answerArea = computed(() => getAnswerAreaAccordingId(props.areaId))
 const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
 
-const answerContainer = ref(null);
-watch(() => props.sheetContainer, () => {
-  console.log('essayAnswerArea props.sheetContainer change')
-  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
-});
 
 const updateHeight = (entries) => {
   for (const entry of entries) {
@@ -44,9 +38,9 @@ const pixelPerMm = dpi / mmToInch
 
 const defaultFontWidth = projectConfig.value.defaultFontWidth
 const defaultFontWidthPx = defaultFontWidth * pixelPerMm
-const defaultClientAnswerHeightPx = 2 * defaultFontWidthPx
-const clientAnswerStyle = {
-  height: defaultClientAnswerHeightPx + 'px'
+const defaultLineAnswerHeightPx = 2 * defaultFontWidthPx
+const lineAnswerStyle = {
+  height: defaultLineAnswerHeightPx + 'px'
 }
 
 </script>
@@ -54,16 +48,16 @@ const clientAnswerStyle = {
 <template>
   <AnswerAreaTitle :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
-  <div class="answerContainer" ref="answerContainer">
+  <div class="answerContainer clientAnswer" :question-number="answerArea.answers[0].questionNumber">
     <div style="display: flex;width: 100%;align-items: flex-end">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
-      <div class="clientAnswer" style="border-bottom: 1px solid black;width: 100%"
-           :style="clientAnswerStyle"></div>
+      <div class="lineAnswer" style="border-bottom: 1px solid black;width: 100%"
+           :style="lineAnswerStyle"></div>
     </div>
 
-    <div v-for="line in answerArea.answers[0].numOfLines" class="clientAnswer"
+    <div v-for="line in answerArea.answers[0].numOfLines" class="lineAnswer"
          style="border-bottom: 1px solid black;width: 100%"
-         :style="clientAnswerStyle"></div>
+         :style="lineAnswerStyle"></div>
 
 
   </div>

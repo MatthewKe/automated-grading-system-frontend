@@ -1,8 +1,7 @@
 <script setup>
-import {computed, onMounted, onUnmounted, ref, watch, watchEffect} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
 import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-import uploadCoordinate from "@/components/answerArea/uploadCoordinate.js";
 
 const props = defineProps({
   height: Number,
@@ -21,11 +20,6 @@ const answerAreaIndex = computed(() => getAnswerAreaIndex(props.areaId))
 const answerAreaTitleHeight = ref(0)
 const answerContainerHeight = computed(() => props.height - answerAreaTitleHeight.value)
 const answerAreaTitle = ref(null)
-
-const answerContainer = ref(null);
-watch(() => props.sheetContainer, () => {
-  uploadCoordinate(answerContainer.value, props.sheetContainer, props.indexOfSheets, props.indexOfAnswerAreaContainers, props.areaId)
-});
 
 
 onMounted(() => {
@@ -60,7 +54,8 @@ const doResize = (event) => {
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer" :style="{height:answerContainerHeight+'px'}" ref="answerContainer">
+    <div class="answerContainer clientAnswer" :question-number="answerArea.answers[0].questionNumber"
+         :style="{height:answerContainerHeight+'px'}">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>

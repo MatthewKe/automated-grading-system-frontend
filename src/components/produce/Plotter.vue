@@ -2,13 +2,14 @@
 import {computed, inject, onMounted, ref, watch} from 'vue'
 import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
-import projectConfig, {addAnswerArea, reorderAnswerArea} from "@/components/projectConfig.js";
+import projectConfig, {addAnswerArea, getAnswer, reorderAnswerArea} from "@/components/projectConfig.js";
 import CalculatingAnswerArea from "@/components/answerArea/CalculatingAnswerArea.vue";
 import MultipleChoiceAnswerArea from "@/components/answerArea/MultipleChoiceAnswerArea.vue";
 import EssayAnswerArea from "@/components/answerArea/EssayAnswerArea.vue";
 import FillBlanksAnswerArea from "@/components/answerArea/FillBlanksAnswerArea.vue";
 import {setClickEvent} from "@/components/clickState.js";
 import {throttle} from "lodash";
+import downloadPDFState from "@/components/produce/downloadPDF.js";
 
 const sizes = {
   A3: {width: 420, height: 297},
@@ -207,8 +208,46 @@ onMounted(() => {
   })
   resizeObserver.observe(sheetContainer.value)
 })
+watch(downloadPDFState, () => {
+  if (downloadPDFState.value === true) {
+    getCoordinate()
+  }
+  downloadPDFState.value = false;
+})
 
+function findParentByClassName(element, className) {
+  while (element && element !== document.body) {
+    element = element.parentElement;
+    if (element.classList.contains(className)) {
+      return element;
+    }
+  }
+  return null;
+}
 
+function getCoordinate() {
+  const childrenWithClass = sheetContainer.value.querySelectorAll('.clientAnswer')
+  console.log(childrenWithClass) // 这里可以访问到你的 div 元素
+  childrenWithClass.forEach(
+      el => {
+        const questionNumber = el.getAttribute('question-number')
+        console.log(questionNumber)
+        const answerRect = el.getBoundingClientRect()
+        const answerAreaContainer = findParentByClassName(el, 'answerAreaContainer')
+        const answerAreaContainerRect = answerAreaContainer.getBoundingClientRect()
+        console.log(answerAreaContainer)
+        const relativeLeftTopX = (answerRect.left - answerAreaContainerRect.left) / answerAreaContainerRect.width
+        const relativeLeftTopY = (answerRect.top - answerAreaContainerRect.top) / answerAreaContainerRect.height
+        const relativeRightBottomX = (answerRect.right - answerAreaContainerRect.left) / answerAreaContainerRect.width
+        const relativeRightBottomY = (answerRect.bottom - answerAreaContainerRect.top) / answerAreaContainerRect.height
+        const answer = getAnswer(questionNumber)
+        answer.relativeLeftTopX = relativeLeftTopX
+        answer.relativeLeftTopY = relativeLeftTopY
+        answer.relativeRightBottomX = relativeRightBottomX
+        answer.relativeRightBottomY = relativeRightBottomY
+      }
+  )
+}
 </script>
 
 <template>

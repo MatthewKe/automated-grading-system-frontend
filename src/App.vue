@@ -9,7 +9,7 @@
           <router-link to="/produce_overview">制作答题卡</router-link>
         </li>
         <li>
-          <router-link to="/grade">批改</router-link>
+          <router-link to="/grade_overview">批改</router-link>
         </li>
         <li class="right-align">
           <div v-if="userState.ifLogin">
