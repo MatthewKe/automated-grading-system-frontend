@@ -5,6 +5,7 @@ import {ref, watch} from "vue";
 import AddImg from "@/assets/add.png";
 import {Search, Upload} from "@element-plus/icons-vue";
 import http from "@/components/http.js";
+import {AxiosHeaders as Arrays} from "axios";
 
 const gradeInfos = ref([
   {
@@ -53,6 +54,7 @@ function fileInput(event) {
 }
 
 function handleFileUpload() {
+  fileInputButton.value.value = ''
   fileInputButton.value.click()
 }
 
@@ -61,10 +63,9 @@ watch(files, () => {
     return
   }
   const formData = new FormData();
-  files.value.forEach(file => {
+  Array.from(files.value).forEach(file => {
     formData.append('files[]', file);
   });
-
   http.post('/grade/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -72,15 +73,9 @@ watch(files, () => {
   })
       .then(response => {
         console.log('文件上传成功:', response.data);
-
       })
-      .catch(error => {
-        console.error('上传出错:', error);
-
-      });
-
-
-}, {immediate: false})
+  files.value = [];
+}, {immediate: false, deep: true})
 
 const searchInput = ref('')
 </script>
@@ -89,7 +84,7 @@ const searchInput = ref('')
   <div class="grade-overview">
     <h1>批改</h1>
     <div class="upload-search">
-      <input type="file" ref="fileInputButton" @change="fileInput" multiple style="display: none;">
+      <input type="file" ref="fileInputButton" @input="fileInput" multiple style="display: none;">
       <el-button type="primary" style="background-color: #277da1;border: 0" @click="handleFileUpload">
         上传答题卡
         <el-icon class="el-icon--right">
