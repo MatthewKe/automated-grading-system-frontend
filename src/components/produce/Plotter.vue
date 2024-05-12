@@ -227,15 +227,12 @@ function findParentByClassName(element, className) {
 
 function getCoordinate() {
   const childrenWithClass = sheetContainer.value.querySelectorAll('.clientAnswer')
-  console.log(childrenWithClass) // 这里可以访问到你的 div 元素
   childrenWithClass.forEach(
       el => {
         const questionNumber = el.getAttribute('question-number')
-        console.log(questionNumber)
         const answerRect = el.getBoundingClientRect()
         const answerAreaContainer = findParentByClassName(el, 'answerAreaContainer')
         const answerAreaContainerRect = answerAreaContainer.getBoundingClientRect()
-        console.log(answerAreaContainer)
         const relativeLeftTopX = (answerRect.left - answerAreaContainerRect.left) / answerAreaContainerRect.width
         const relativeLeftTopY = (answerRect.top - answerAreaContainerRect.top) / answerAreaContainerRect.height
         const relativeRightBottomX = (answerRect.right - answerAreaContainerRect.left) / answerAreaContainerRect.width

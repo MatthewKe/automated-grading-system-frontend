@@ -219,9 +219,9 @@ export function addAnswerArea(type, idOfPreAnswerArea, idOfSubsequentAnswerArea)
         title: typeToDefaultTitle[type]
     })
     if (type === 'essayAnswerArea') {
-        essayAddAnswer(id, [], 0, 10)
+        essayAddAnswer(id, '', 0, 10)
     } else {
-        defaultAddAnswer(id, [], 0)
+        defaultAddAnswer(id, '', 0)
     }
     reorderAnswerArea(idOfPreAnswerArea, idOfSubsequentAnswerArea, id)
 }

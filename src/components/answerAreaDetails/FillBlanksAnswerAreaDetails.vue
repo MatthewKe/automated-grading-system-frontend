@@ -18,7 +18,7 @@ const onAddItem = () => {
   } else {
     score = answerArea.value.answers[answerArea.value.answers.length - 1].score
   }
-  defaultAddAnswer(answerArea.value.id, [], score)
+  defaultAddAnswer(answerArea.value.id, '', score)
   nextTick(() => {
     scrollToBottom();
   })
