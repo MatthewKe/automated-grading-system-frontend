@@ -3,8 +3,6 @@
 import PreSet from "@/components/produce/PreSet.vue";
 import plotter from "@/components/produce/Plotter.vue";
 import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.js";
-
-
 import SheetDetails from "@/components/produce/SheetDetails.vue";
 import detailsInfo from "@/components/detailsOfProduce.js";
 import {provide, ref} from "vue";

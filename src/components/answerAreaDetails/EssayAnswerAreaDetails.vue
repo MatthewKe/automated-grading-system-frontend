@@ -22,10 +22,7 @@ const tableRef = ref(null)
       <h3>行数</h3>
       <el-input-number v-model="answerArea.answers[0].numOfLines" size="small" style="width: 100px"></el-input-number>
     </div>
-    <div style="display: flex;align-items: center;width: 90%;gap:20px">
-      <h3>自动批卷</h3>
-      <el-switch v-model="ifAutomated"/>
-    </div>
+
     <h3>正确答案</h3>
     <el-input v-model="answerArea.answers[0].correctAnswer" size="small"></el-input>
     <el-divider/>

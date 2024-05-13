@@ -5,13 +5,13 @@ import {ref} from 'vue'
 import http from "@/components/http.js";
 import projectConfig from "@/components/projectConfig.js";
 import router from "@/main.js";
-
+import sample from "@/assets/sample.png"
 
 const papers = ref([])
 
+let containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 
 try {
-
   const response = await http.get('/produce/overview');
   console.log('produce overview successful:', response);
   Object.entries(response.data.projectConfigs).forEach(([key, value]) => {
@@ -30,7 +30,6 @@ try {
 async function goToProduce(projectId) {
   try {
     const response = await http.get(`/produce/getProjectConfig?projectId=${projectId}`)
-    console.log('goToProduce successful:', response);
     projectConfig.value = JSON.parse(response.data.projectConfig)
     router.push({path: '/produce', query: {project_id: projectId}})
   } catch (error) {
@@ -52,23 +51,29 @@ async function createProject() {
 </script>
 
 <template>
-
-  <h4 style="margin: 20px">我制作的答题卡</h4>
-  <!--  todo 搜索功能-->
-  <!--  <SearchBox></SearchBox>-->
-
-  <div id="paper-gallery">
-    <div class="paper-container">
-      <img class="paper" alt="" v-bind:src="AddImg" id="add" @click="createProject()"/>
+  <el-scrollbar style="background: #F4F6F8" :style="{height:containerHeight+'px'}">
+    <h1 style="margin: 20px;font-size: 50px">我制作的答题卡</h1>
+    <!--  todo 搜索功能-->
+    <!--  <SearchBox></SearchBox>-->
+    <div class="grade-overview">
+      <div id="paper-gallery">
+        <div class="paper-container">
+          <img class="paper" alt="" :src="AddImg" id="add" @click="createProject()"/>
+        </div>
+        <div class="paper-container" v-for="(item) in papers">
+          <img class="paper" :src="item.img===undefined?sample:item.img" alt=""
+               @click="goToProduce(item.projectId)"></img>
+          <p class="paper-name">{{ item.title }}</p>
+        </div>
+      </div>
     </div>
-    <div class="paper-container" v-for="(item,index) in papers">
-      <img class="paper" v-bind:src="item.img" alt="" @click="goToProduce(item.projectId)"></img>
-      <p class="paper-name">{{ item.title }}</p>
-    </div>
-  </div>
+  </el-scrollbar>
+
 </template>
 
 <style scoped>
+
+
 #paper-gallery {
   display: flex;
   justify-content: space-between;
@@ -85,7 +90,7 @@ async function createProject() {
 
 .paper:hover {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
-  transform: scale(1.05);
+  transform: scale(1.01);
   transition: transform 0.1s ease;
 }
 

@@ -35,10 +35,7 @@ function scrollToBottom() {
 
 <template>
   <div v-if="answerArea">
-    <div style="display: flex;align-items: center;width: 90%;gap:40px">
-      <h2>自动批卷</h2>
-      <el-switch v-model="ifAutomated"/>
-    </div>
+
     <h2>题目设置</h2>
     <el-table ref="tableRef" :data="answerArea.answers" style="width: 90%" max-height="230">
       <el-table-column fixed prop="questionNumber" label="题号" width="60"/>

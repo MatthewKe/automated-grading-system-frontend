@@ -1,50 +1,13 @@
 <script setup>
 
-import GradeInfo from "@/components/grade/GradeInfo.vue";
 import {ref, watch} from "vue";
-import AddImg from "@/assets/add.png";
-import {Search, Upload} from "@element-plus/icons-vue";
+import {Timer, Upload} from "@element-plus/icons-vue";
 import http from "@/components/http.js";
-import {AxiosHeaders as Arrays} from "axios";
+import router from "@/main.js";
 
-const gradeInfos = ref([
-  {
-    patchId: 1,
-    timestamp: "2024-05-09-19:49",
-    numOfUploadImages: 100,
-    numOfSucceedProcessImages: 90,
-    title: '第一次数学模拟考试'
-  }, {
-    patchId: 1,
-    timestamp: "2024-05-09-19:49",
-    numOfUploadImages: 100,
-    numOfSucceedProcessImages: 90,
-    title: '第一次数学模拟考试'
-  }, {
-    patchId: 1,
-    timestamp: "2024-05-09-19:49",
-    numOfUploadImages: 100,
-    numOfSucceedProcessImages: 90,
-    title: '第一次数学模拟考试'
-  }, {
-    patchId: 1,
-    timestamp: "2024-05-09-19:49",
-    numOfUploadImages: 100,
-    numOfSucceedProcessImages: 100,
-    title: '第一次数学模拟考试'
-  }])
+const containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
+const gradeOverviewInfos = ref([])
 
-function getColorBarStyle(gradeInfo) {
-  if (gradeInfo.numOfSucceedProcessImages === gradeInfo.numOfUploadImages) {
-    return {backgroundColor: '#90be6d'}
-  } else {
-    return {backgroundColor: '#f94144'}
-  }
-}
-
-function goToGrade() {
-
-}
 
 const files = ref([])
 const fileInputButton = ref(null)
@@ -77,86 +40,85 @@ watch(files, () => {
   files.value = [];
 }, {immediate: false, deep: true})
 
-const searchInput = ref('')
+http.get('/grade/overview')
+    .then(response => {
+      console.log(response)
+      gradeOverviewInfos.value = response.data.gradeOverviewVos;
+    })
+
+async function goToGrade(row) {
+  try {
+    let batchNumber = row.batchNumber;
+    let title = row.title
+    let timestamp = row.timestamp
+    await router.push({
+      path: '/batch_grade',
+      query: {batchNumber: batchNumber, batchInfo: timestamp + ' ' + title}
+    })
+  } catch (error) {
+    console.error('goToGrade failed:', error);
+  }
+}
 </script>
 
 <template>
-  <div class="grade-overview">
-    <h1>批改</h1>
-    <div class="upload-search">
-      <input type="file" ref="fileInputButton" @input="fileInput" multiple style="display: none;">
-      <el-button type="primary" style="background-color: #277da1;border: 0" @click="handleFileUpload">
-        上传答题卡
-        <el-icon class="el-icon--right">
-          <Upload/>
-        </el-icon>
-      </el-button>
-
-      <el-input
-          v-model="searchInput"
-          style="max-width: 600px"
-          placeholder="输入答题卡标题或时间"
-          class="input-with-select"
-      >
-        <template #append>
-          <el-button :icon="Search"/>
-        </template>
-      </el-input>
-    </div>
-    <div class="grade-info-container" v-for="gradeInfo in gradeInfos">
-      <div class="card" @click="goToGrade">
-        <div class="color-bar" :style="getColorBarStyle(gradeInfo)"></div>
-        <div class="card-content">
-          <GradeInfo :gradeInfo="gradeInfo"></GradeInfo>
-        </div>
+  <el-scrollbar style="background: #F4F6F8" :style="{height:containerHeight+'px'}">
+    
+    <h1 style=" margin: 20px;font-size: 50px">我批改的答题卡</h1>
+    <div class="grade-overview">
+      <div style="display: flex;justify-content: flex-end;width: 100%">
+        <input type="file" ref="fileInputButton" @input="fileInput" multiple style="display: none;">
+        <el-button type="primary" style="background-color: #277da1;border: 0;font-weight: bold"
+                   @click="handleFileUpload">
+          上传答题卡
+          <el-icon class="el-icon--right">
+            <Upload/>
+          </el-icon>
+        </el-button>
       </div>
+      <el-table :data="gradeOverviewInfos" style="width: 100%" @row-click="goToGrade">
+        <el-table-column prop="timestamp" label="上传时间">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <el-icon>
+                <timer/>
+              </el-icon>
+              <span style="margin-left: 10px">{{ scope.row.timestamp }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="title" label="答题卡标题"/>
+        <el-table-column prop="state" label="当前状态">
+          <template #default="scope">
+            <div style="display: flex">
+              <div v-if="scope.row.state==='批改完成'" style="background: #90be6d;padding-left: 5px;padding-right: 5px">
+                {{ scope.row.state }}
+              </div>
+              <div v-if="scope.row.state==='正在批改'" style="background: #FFD43A;padding-left: 5px;padding-right: 5px">
+                {{ scope.row.state }}
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="numOfUploadImages" label="上传的答题卡图片数量"/>
+        <el-table-column prop="numOfSucceedProcessImages" label="成功处理的答题卡图片数量"/>
+      </el-table>
     </div>
-  </div>
 
+  </el-scrollbar>
 </template>
 
 <style scoped>
-.upload-search {
-  display: flex;
-  width: 80%;
-  justify-content: space-around
-}
 
 .grade-overview {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-}
-
-.grade-info-container {
-  display: flex;
-  flex-direction: column;
-  width: 80%
-}
-
-.card {
-  display: flex;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.card:hover {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
-  transform: scale(1.05);
-  transition: transform 0.1s ease;
-}
-
-.color-bar {
-  width: 20px;
-}
-
-.card-content {
-  padding: 20px;
-  flex-grow: 1;
-  height: 60px;
+  background: white;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 0.375rem;
 }
 
 

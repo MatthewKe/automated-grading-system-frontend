@@ -64,7 +64,7 @@ let answerAreaContainers = ref([])
 
 const throttledFunc = throttle(() => {
   answerAreaContainers.value = updateAnswerAreaContainers()
-}, 50);
+}, 20);
 
 watch(projectConfig, throttledFunc, {
   immediate: true,
