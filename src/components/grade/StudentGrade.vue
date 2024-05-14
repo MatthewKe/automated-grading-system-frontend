@@ -1,7 +1,7 @@
 <script setup>
 
 import {Timer, Upload} from "@element-plus/icons-vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import http from "@/components/http.js";
 import CardImage from "@/assets/card.png"
 
@@ -18,36 +18,58 @@ const originalImages = ref([])
 
 const processedImageInfos = ref([])
 
-http.get(`/grade/getStudentGradeInfo?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
-    .then(response => {
-      console.log(response)
-      batchGradeInfos.value = response.data
-    })
+watch(processedImageInfos, processedImageInfos => {
+  console.log(processedImageInfos)
+})
 
-http.get(`/grade/getStudentOriginalImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
-    .then(response => {
-      for (let originalImageId of response.data) {
-        http.get(`/grade/getOriginalImage?originalImageId=${originalImageId}`, {responseType: 'blob'})
-            .then(response => {
-              originalImages.value.push(URL.createObjectURL(response.data))
-              console.log(response)
-            })
-      }
-    })
+function getStudentGradeInfo() {
+  http.get(`/grade/getStudentGradeInfo?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+      .then(response => {
+        console.log(response)
+        batchGradeInfos.value = response.data
+      })
+}
 
-http.get(`/grade/getStudentProcessedImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
-    .then(response => {
-      console.log(response)
-      processedImageInfos.value = response.data;
-      processedImageInfos.value.sort((a, b) => Number(a.answerNumber) - Number(b.answerNumber))
-      for (let processedImageInfo of processedImageInfos.value) {
-        http.get(`/grade/getProcessedImage?processedImageId=${processedImageInfo.processedImagesInfoId}`, {responseType: 'blob'})
-            .then(response => {
-              processedImageInfo.imgURL = URL.createObjectURL(response.data)
-            })
-      }
-    })
+function getStudentOriginalImageIds() {
+  http.get(`/grade/getStudentOriginalImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+      .then(response => {
+        for (let originalImageId of response.data) {
+          http.get(`/grade/getOriginalImage?originalImageId=${originalImageId}`, {responseType: 'blob'})
+              .then(response => {
+                originalImages.value.push(URL.createObjectURL(response.data))
+                console.log(response)
+              })
+        }
+      })
+}
 
+function getStudentProcessedImageIds() {
+  http.get(`/grade/getStudentProcessedImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+      .then(response => {
+        console.log(response)
+        response.data.sort((a, b) => Number(a.answerNumber) - Number(b.answerNumber))
+        processedImageInfos.value = response.data;
+        for (let processedImageInfo of processedImageInfos.value) {
+          http.get(`/grade/getProcessedImage?processedImageId=${processedImageInfo.processedImageInfoId}`, {responseType: 'blob'})
+              .then(response => {
+                processedImageInfo.imgURL = URL.createObjectURL(response.data)
+              })
+        }
+      })
+}
+
+
+function updateScore(processedImageInfo) {
+  http.post(`/grade/updateScore`, processedImageInfo)
+      .then(_ => {
+        getStudentGradeInfo()
+      })
+}
+
+
+getStudentGradeInfo()
+getStudentOriginalImageIds()
+getStudentProcessedImageIds()
 
 </script>
 
@@ -122,7 +144,7 @@ http.get(`/grade/getStudentProcessedImageIds?batchNumber=${props.batchNumber}&st
     </div>
 
     <div class="component-container">
-      <div v-for="processedImageInfo of processedImageInfos">
+      <div v-for="processedImageInfo of processedImageInfos" :key="processedImageInfo.processedImageInfoId">
         <el-card style="">
           <template #header>
             <div class="card-header">
@@ -131,7 +153,8 @@ http.get(`/grade/getStudentProcessedImageIds?batchNumber=${props.batchNumber}&st
           </template>
           <el-image style="width: 100%; height: 100%" :src="processedImageInfo.imgURL" fit="scale-down"/>
           <template #footer>得分：
-            <el-input-number size="small" v-model="processedImageInfo.score" :precision="1" :step="0.5"/>
+            <el-input-number size="small" v-model="processedImageInfo.score" :precision="1" :step="0.5"
+                             @change="updateScore(processedImageInfo)"/>
           </template>
         </el-card>
       </div>

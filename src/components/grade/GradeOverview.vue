@@ -4,6 +4,7 @@ import {ref, watch} from "vue";
 import {Timer, Upload} from "@element-plus/icons-vue";
 import http from "@/components/http.js";
 import router from "@/main.js";
+import {throttle} from "lodash";
 
 const containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
 const gradeOverviewInfos = ref([])
@@ -29,22 +30,37 @@ watch(files, () => {
   Array.from(files.value).forEach(file => {
     formData.append('files[]', file);
   });
-  http.post('/grade/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-      .then(response => {
-        console.log('文件上传成功:', response.data);
-      })
+  http.post('/grade/upload', formData, {headers: {'Content-Type': 'multipart/form-data'}})
+      .then(_ => getOverview())
   files.value = [];
 }, {immediate: false, deep: true})
 
-http.get('/grade/overview')
-    .then(response => {
-      console.log(response)
-      gradeOverviewInfos.value = response.data.gradeOverviewVos;
-    })
+
+watch(gradeOverviewInfos, throttle(
+    () => {
+      console.log("here")
+      for (let gradeOverviewInfo of gradeOverviewInfos.value) {
+        if (gradeOverviewInfo.state !== '批改完成') {
+          getOverview()
+          break;
+        }
+      }
+    },
+    3000
+))
+
+function getOverview() {
+  http.get('/grade/overview')
+      .then(response => {
+        console.log(response.data.gradeOverviewVos)
+        for (let gradeOverviewVo of response.data.gradeOverviewVos) {
+          const dateTimeStr = gradeOverviewVo.timestamp
+          const dateObj = new Date(dateTimeStr);
+          gradeOverviewVo.timestamp = dateObj.toLocaleString();
+        }
+        gradeOverviewInfos.value = response.data.gradeOverviewVos;
+      })
+}
 
 async function goToGrade(row) {
   try {
@@ -59,25 +75,27 @@ async function goToGrade(row) {
     console.error('goToGrade failed:', error);
   }
 }
+
+getOverview()
 </script>
 
 <template>
   <el-scrollbar style="background: #F4F6F8" :style="{height:containerHeight+'px'}">
-    
+
     <h1 style=" margin: 20px;font-size: 50px">我批改的答题卡</h1>
     <div class="grade-overview">
       <div style="display: flex;justify-content: flex-end;width: 100%">
         <input type="file" ref="fileInputButton" @input="fileInput" multiple style="display: none;">
-        <el-button type="primary" style="background-color: #277da1;border: 0;font-weight: bold"
+        <el-button type="primary" style="font-weight: bold;padding: 10px"
                    @click="handleFileUpload">
           上传答题卡
-          <el-icon class="el-icon--right">
+          <el-icon class="el-icon--right" size="20px">
             <Upload/>
           </el-icon>
         </el-button>
       </div>
       <el-table :data="gradeOverviewInfos" style="width: 100%" @row-click="goToGrade">
-        <el-table-column prop="timestamp" label="上传时间">
+        <el-table-column prop="timestamp" label="上传时间" sortable>
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-icon>

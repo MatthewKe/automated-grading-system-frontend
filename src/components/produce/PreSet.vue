@@ -9,6 +9,7 @@ import MultipleChoiceAnswerAreaInPreSet from "@/components/answerArea/MultipleCh
 import http from "@/components/http.js";
 import {useRoute} from "vue-router";
 import downloadPDFState from "@/components/produce/downloadPDF.js";
+import {Download, Upload} from "@element-plus/icons-vue";
 
 const props = defineProps({
   preSetWidth: Number
@@ -71,7 +72,12 @@ function clickDownload() {
                :height="componentHeight"
                :width="componentWidth"></component>
 
-    <el-button v-loading.fullscreen.lock="fullscreenLoading" type="primary" @click="clickDownload">导出答题卡PDF
+    <el-button v-loading.fullscreen.lock="fullscreenLoading" style="font-weight: bold;padding: 10px" type="primary"
+               @click="clickDownload">
+      导出答题卡PDF
+      <el-icon class="el-icon--right" size="20px">
+        <Download/>
+      </el-icon>
     </el-button>
 
   </div>
