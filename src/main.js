@@ -29,7 +29,11 @@ const routes = [
     {
         path: '/student_grade',
         component: StudentGrade,
-        props: route => ({batchInfo: route.query.batchInfo, studentInfo: route.query.studentInfo})
+        props: route => ({
+            batchInfo: route.query.batchInfo,
+            studentInfo: route.query.studentInfo,
+            batchNumber: route.query.batchNumber
+        })
     }
 ]
 

@@ -2,36 +2,53 @@
 
 import {Timer, Upload} from "@element-plus/icons-vue";
 import {ref} from "vue";
+import http from "@/components/http.js";
+import CardImage from "@/assets/card.png"
 
 const containerHeight = window.innerHeight - document.getElementById('navigation-bar').getBoundingClientRect().height - 1
-const gradeInfos = ref({
-  studentsGradeInfo: [
-    {
-      studentName: 'keke',
-      studentId: '201180082',
-      originalImagesInfoId: 20,
-      answer1: 10,
-      answer2: 20,
-      scoreAddUp: 60,
-      ifComplete: '缺项'
-    }, {
-      studentName: 'keke1',
-      studentId: '201180083',
-      originalImagesInfoId: 20,
-      answer1: 10,
-      answer3: 20,
-      scoreAddUp: 60,
-      ifComplete: '完整'
-    }
-  ],
-  maxAnswerNumber: 10
-})
+const batchGradeInfos = ref([])
 
 const props = defineProps({
   batchInfo: String,
   studentInfo: String,
   batchNumber: String
 })
+
+const originalImages = ref([])
+
+const processedImageInfos = ref([])
+
+http.get(`/grade/getStudentGradeInfo?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+    .then(response => {
+      console.log(response)
+      batchGradeInfos.value = response.data
+    })
+
+http.get(`/grade/getStudentOriginalImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+    .then(response => {
+      for (let originalImageId of response.data) {
+        http.get(`/grade/getOriginalImage?originalImageId=${originalImageId}`, {responseType: 'blob'})
+            .then(response => {
+              originalImages.value.push(URL.createObjectURL(response.data))
+              console.log(response)
+            })
+      }
+    })
+
+http.get(`/grade/getStudentProcessedImageIds?batchNumber=${props.batchNumber}&studentId=${props.studentInfo.split(' ')[0]}`)
+    .then(response => {
+      console.log(response)
+      processedImageInfos.value = response.data;
+      processedImageInfos.value.sort((a, b) => Number(a.answerNumber) - Number(b.answerNumber))
+      for (let processedImageInfo of processedImageInfos.value) {
+        http.get(`/grade/getProcessedImage?processedImageId=${processedImageInfo.processedImagesInfoId}`, {responseType: 'blob'})
+            .then(response => {
+              processedImageInfo.imgURL = URL.createObjectURL(response.data)
+            })
+      }
+    })
+
+
 </script>
 
 <template>
@@ -47,7 +64,7 @@ const props = defineProps({
     <h1 style=" margin: 20px;font-size: 50px">学生答题卡详情</h1>
     <div class="container">
       <el-table
-          :data="gradeInfos.studentsGradeInfo"
+          :data="batchGradeInfos.studentGradeInfoVOs"
           style="width: 100%"
           row-key="studentId"
       >
@@ -84,19 +101,58 @@ const props = defineProps({
             width="100">
         </el-table-column>
         <el-table-column
-            v-for="n in gradeInfos.maxAnswerNumber"
+            v-for="n in batchGradeInfos.maxAnswerNumber"
             :key="`answer${n}`"
             :prop="`answer${n}`"
             :label="`题目${n}得分`"
             width="100">
+          <template #default="scope">
+            {{ batchGradeInfos.studentGradeInfoVOs[scope.$index].scores[`${n}`] }}
+          </template>
         </el-table-column>
-
       </el-table>
+    </div>
+
+    <div class="component-container">
+      <el-carousel height="500px" style="width: 100%;">
+        <el-carousel-item v-for="item in originalImages" :key="item">
+          <el-image style="width: 100%; height: 100%" :src="item" fit="scale-down"/>
+        </el-carousel-item>
+      </el-carousel>
+    </div>
+
+    <div class="component-container">
+      <div v-for="processedImageInfo of processedImageInfos">
+        <el-card style="">
+          <template #header>
+            <div class="card-header">
+              <span>题目 {{ processedImageInfo.answerNumber }}</span>
+            </div>
+          </template>
+          <el-image style="width: 100%; height: 100%" :src="processedImageInfo.imgURL" fit="scale-down"/>
+          <template #footer>得分：
+            <el-input-number size="small" v-model="processedImageInfo.score" :precision="1" :step="0.5"/>
+          </template>
+        </el-card>
+      </div>
     </div>
 
   </el-scrollbar>
 </template>
 <style scoped>
+
+.component-container {
+  justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 0.375rem;
+}
 
 .container {
   display: flex;

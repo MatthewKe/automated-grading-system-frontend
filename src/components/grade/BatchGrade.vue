@@ -94,8 +94,9 @@ async function goToStudentGrade(row) {
             {{ batchGradeInfos.studentGradeInfoVOs[scope.$index].scores[`${n}`] }}
           </template>
         </el-table-column>
-
       </el-table>
+
+
     </div>
 
   </el-scrollbar>
