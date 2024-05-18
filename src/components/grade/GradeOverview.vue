@@ -40,7 +40,7 @@ watch(gradeOverviewInfos, throttle(
     () => {
       console.log("here")
       for (let gradeOverviewInfo of gradeOverviewInfos.value) {
-        if (gradeOverviewInfo.state !== '批改完成') {
+        if (gradeOverviewInfo.state === '正在批改') {
           getOverview()
           break;
         }
@@ -115,6 +115,11 @@ getOverview()
               <div v-if="scope.row.state==='正在批改'" style="background: #FFD43A;padding-left: 5px;padding-right: 5px">
                 {{ scope.row.state }}
               </div>
+              <div v-if="scope.row.state==='部分答题卡处理失败'"
+                   style="background: #b6b6ba;padding-left: 5px;padding-right: 5px">
+                {{ scope.row.state }}
+              </div>
+
             </div>
           </template>
         </el-table-column>

@@ -4,10 +4,11 @@ import {computed, watch} from "vue";
 import {answerAreaUndefined, getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
 import {Delete} from '@element-plus/icons-vue'
 import {deleteAnswerArea} from "@/components/projectConfig.js";
-import MultipleChoiceAnswerAreaDetails from "@/components/answerAreaDetails/MultipleChoiceAnswerAreaDetails.vue";
-import FillBlanksAnswerAreaDetails from "@/components/answerAreaDetails/FillBlanksAnswerAreaDetails.vue";
-import CalculatingAnswerAreaDetails from "@/components/answerAreaDetails/CalculatingAnswerAreaDetails.vue";
-import EssayAnswerAreaDetails from "@/components/answerAreaDetails/EssayAnswerAreaDetails.vue";
+import MultipleChoiceAnswerAreaDetails
+  from "@/components/produce/answerAreaDetails/MultipleChoiceAnswerAreaDetails.vue";
+import FillBlanksAnswerAreaDetails from "@/components/produce/answerAreaDetails/FillBlanksAnswerAreaDetails.vue";
+import CalculatingAnswerAreaDetails from "@/components/produce/answerAreaDetails/CalculatingAnswerAreaDetails.vue";
+import EssayAnswerAreaDetails from "@/components/produce/answerAreaDetails/EssayAnswerAreaDetails.vue";
 
 const props = defineProps({
   componentDetailsWidth: Number

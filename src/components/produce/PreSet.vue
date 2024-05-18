@@ -1,11 +1,11 @@
 <script setup>
 
 import {computed, ref} from 'vue'
-import CalculatingAnswerAreaInPreSet from "@/components/answerArea/CalculatingAnswerAreaInPreSet.vue";
-import OtherAnswerAreaInPreSet from "@/components/answerArea/OtherAnswerAreaInPreSet.vue";
-import EssayAnswerAreaInPreSet from "@/components/answerArea/EssayAnswerAreaInPreSet.vue";
-import FillBlanksAnswerAreaInPreSet from "@/components/answerArea/FillBlanksAnswerAreaInPreSet.vue";
-import MultipleChoiceAnswerAreaInPreSet from "@/components/answerArea/MultipleChoiceAnswerAreaInPreSet.vue";
+import CalculatingAnswerAreaInPreSet from "@/components/produce/preset/CalculatingAnswerAreaInPreSet.vue";
+import OtherAnswerAreaInPreSet from "@/components/produce/preset/OtherAnswerAreaInPreSet.vue";
+import EssayAnswerAreaInPreSet from "@/components/produce/preset/EssayAnswerAreaInPreSet.vue";
+import FillBlanksAnswerAreaInPreSet from "@/components/produce/preset/FillBlanksAnswerAreaInPreSet.vue";
+import MultipleChoiceAnswerAreaInPreSet from "@/components/produce/preset/MultipleChoiceAnswerAreaInPreSet.vue";
 import http from "@/components/http.js";
 import {useRoute} from "vue-router";
 import downloadPDFState from "@/components/produce/downloadPDF.js";

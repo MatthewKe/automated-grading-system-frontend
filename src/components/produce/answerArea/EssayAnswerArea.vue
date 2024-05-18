@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
-import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
+import AnswerAreaTitle from "@/components/produce/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
   height: Number,

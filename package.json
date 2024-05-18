@@ -13,12 +13,14 @@
     "axios": "^1.6.8",
     "dom-to-image": "^2.6.0",
     "element-plus": "^2.6.3",
+    "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "lodash": "^4.17.21",
     "qrcode-svg": "^1.1.0",
     "vue": "^3.4.21",
     "vue-resize-directive": "^1.2.0",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

@@ -1,0 +1,52 @@
+<script setup>
+import {onMounted} from "vue";
+
+const props = defineProps({
+  width: Number,
+  height: Number
+})
+
+function startDrag(event) {
+  event.dataTransfer.setData("text/plain", "new a multipleChoiceAnswerArea")
+}
+
+function endDrag(event) {
+  event.preventDefault()
+}
+
+
+</script>
+
+<template>
+  <div
+      id="multipleChoiceAnswerAreaInPreSet"
+      draggable="true"
+      @dragstart="startDrag"
+      @dragend="endDrag"
+      class="container"
+      :style="{width: width+'px',height:height+'px',lineHeight:height+'px'}"
+  >
+    <span class="material-symbols-outlined">
+      select_check_box
+    </span>
+    选择题
+  </div>
+</template>
+
+<style scoped>
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 2px solid #000000;
+  font-weight: bold;
+  text-align: center;
+  font-size: 20px;
+}
+
+canvas {
+  box-sizing: border-box;
+  border: 2px solid #000000;
+}
+</style>

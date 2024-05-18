@@ -6,7 +6,7 @@ import {V3DragZoomContainer} from "@/components/v3-drag-zoom/dist/v3-drag-zoom.j
 import SheetDetails from "@/components/produce/SheetDetails.vue";
 import detailsInfo from "@/components/detailsOfProduce.js";
 import {provide, ref} from "vue";
-import AnswerAreaDetails from "@/components/answerAreaDetails/AnswerAreaDetails.vue";
+import AnswerAreaDetails from "@/components/produce/answerAreaDetails/AnswerAreaDetails.vue";
 import http from "@/components/http.js";
 import projectConfig from "@/components/projectConfig.js";
 import {useRoute} from "vue-router";

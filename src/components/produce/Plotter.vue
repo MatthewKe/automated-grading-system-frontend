@@ -1,12 +1,12 @@
 <script setup>
 import {computed, inject, onMounted, ref, watch} from 'vue'
-import OtherAnswerArea from "@/components/answerArea/OtherAnswerArea.vue";
+import OtherAnswerArea from "@/components/produce/answerArea/OtherAnswerArea.vue";
 import InfoArea from "@/components/InfoArea.vue";
 import projectConfig, {addAnswerArea, getAnswer, reorderAnswerArea} from "@/components/projectConfig.js";
-import CalculatingAnswerArea from "@/components/answerArea/CalculatingAnswerArea.vue";
-import MultipleChoiceAnswerArea from "@/components/answerArea/MultipleChoiceAnswerArea.vue";
-import EssayAnswerArea from "@/components/answerArea/EssayAnswerArea.vue";
-import FillBlanksAnswerArea from "@/components/answerArea/FillBlanksAnswerArea.vue";
+import CalculatingAnswerArea from "@/components/produce/answerArea/CalculatingAnswerArea.vue";
+import MultipleChoiceAnswerArea from "@/components/produce/answerArea/MultipleChoiceAnswerArea.vue";
+import EssayAnswerArea from "@/components/produce/answerArea/EssayAnswerArea.vue";
+import FillBlanksAnswerArea from "@/components/produce/answerArea/FillBlanksAnswerArea.vue";
 import {setClickEvent} from "@/components/clickState.js";
 import {throttle} from "lodash";
 import downloadPDFState from "@/components/produce/downloadPDF.js";
@@ -128,6 +128,7 @@ function updateAnswerAreaContainers() {
         })
     heightLeftPx = heightLeftPx - answerAreaHeightPx - gapBetweenAnswerAreaPx.value
   }
+  console.log(answerAreaContainers)
   return answerAreaContainers
 }
 

@@ -1,8 +1,7 @@
 <script setup>
 import {computed, onMounted, ref} from "vue";
 import {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
-import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
-
+import AnswerAreaTitle from "@/components/produce/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
   height: Number,
@@ -22,6 +21,7 @@ const answerAreaTitleHeight = ref(0)
 const answerContainerHeight = computed(() => props.height - answerAreaTitleHeight.value)
 const answerAreaTitle = ref(null)
 
+
 onMounted(() => {
   answerAreaTitleHeight.value = answerAreaTitle.value.$el.clientHeight
 })
@@ -29,6 +29,7 @@ onMounted(() => {
 let startY
 
 function startResize(event) {
+  console.log('startResize')
   startY = event.clientY;
 }
 
@@ -45,13 +46,15 @@ const doResize = (event) => {
   }
   answerArea.value.height += heightDiff / pixelPerMm / scale
 }
+
+
 </script>
 
 <template>
   <AnswerAreaTitle ref="answerAreaTitle" :title-ctx="answerArea.title"
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="flexibleContainer">
-    <div class="answerContainer  clientAnswer" :question-number="answerArea.answers[0].questionNumber"
+    <div class="answerContainer clientAnswer" :question-number="answerArea.answers[0].questionNumber"
          :style="{height:answerContainerHeight+'px'}">
       <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
     </div>
@@ -62,7 +65,6 @@ const doResize = (event) => {
 <style scoped>
 .flexibleContainer {
   position: relative;
-
 }
 
 .drag-handle {
@@ -71,9 +73,9 @@ const doResize = (event) => {
   left: 0;
   width: 100%;
   z-index: 2;
-  height: 20px;
+  height: 20px; /* 拖拽条高度 */
   background: rgba(0, 51, 255, 0);
-  cursor: ns-resize;
+  cursor: ns-resize; /* 北南光标表示可以垂直拖拽 */
 }
 
 .answerContainer {

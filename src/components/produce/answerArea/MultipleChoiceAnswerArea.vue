@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted} from "vue";
 import projectConfig, {getAnswerAreaAccordingId, getAnswerAreaIndex} from "@/components/projectConfig.js";
-import AnswerAreaTitle from "@/components/answerArea/AnswerAreaTitle.vue";
+import AnswerAreaTitle from "@/components/produce/answerArea/AnswerAreaTitle.vue";
 
 const props = defineProps({
   height: Number,
@@ -65,7 +65,6 @@ onMounted(() => {
   padding-bottom: 10px;
   padding-right: 10px;
   padding-left: 10px;
-
   display: flex;
   border: 2px solid #000000;
   flex-wrap: wrap;
