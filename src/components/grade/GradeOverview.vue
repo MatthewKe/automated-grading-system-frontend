@@ -38,7 +38,6 @@ watch(files, () => {
 
 watch(gradeOverviewInfos, throttle(
     () => {
-      console.log("here")
       for (let gradeOverviewInfo of gradeOverviewInfos.value) {
         if (gradeOverviewInfo.state === '正在批改') {
           getOverview()

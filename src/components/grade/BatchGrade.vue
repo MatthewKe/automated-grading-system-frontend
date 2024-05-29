@@ -1,6 +1,6 @@
 <script setup>
 
-import {Timer, Upload} from "@element-plus/icons-vue";
+import {Download, Timer, Upload} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import router from "@/main.js";
 import http from "@/components/http.js";
@@ -23,7 +23,7 @@ http.get(`/grade/getBatchGradeInfo?batchNumber=${props.batchNumber}`)
     .then(response => {
       console.log(response.data)
       if (response.data.failedOriginalImageInfos)
-        for (let failedOriginalImageInfo of response.data.failedOriginalImageInfos) {
+        for (const failedOriginalImageInfo of response.data.failedOriginalImageInfos) {
           http.get(`/grade/getOriginalImage?originalImageId=${failedOriginalImageInfo.failedOriginalImageId}`, {responseType: 'blob'})
               .then(response => {
                 failedOriginalImageInfos.value.push({
@@ -68,18 +68,14 @@ function exportToExcel() {
     }
     return row;
   });
-
   // 创建工作簿和工作表
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(data);
-
   // 添加工作表到工作簿
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
   // 生成Excel文件并保存
   const wbout = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
   saveAs(new Blob([wbout], {type: 'application/octet-stream'}), 'table-data.xlsx');
-
 }
 </script>
 
@@ -91,7 +87,16 @@ function exportToExcel() {
     </el-breadcrumb>
     <h1 style=" margin: 20px;font-size: 50px">答题卡批改结果</h1>
     <div class="container">
-      <el-button @click="exportToExcel">Export to Excel</el-button>
+      <div style="display: flex;justify-content: flex-end;width: 100%">
+
+        <el-button style="font-weight: bold;padding: 10px"
+                   @click="exportToExcel">
+          导出为Excel
+          <el-icon class="el-icon--right" size="20px">
+            <Download/>
+          </el-icon>
+        </el-button>
+      </div>
       <el-table
           :data="batchGradeInfos.studentGradeInfoVOs"
           style="width: 100%"
@@ -141,6 +146,7 @@ function exportToExcel() {
           </template>
         </el-table-column>
       </el-table>
+
     </div>
     <el-collapse style="background: white;margin: 20px;padding: 10px;border-radius: 0.375rem;" v-model="activeNames"
                  @change="handleChange">

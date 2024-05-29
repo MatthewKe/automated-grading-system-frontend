@@ -53,7 +53,7 @@ const doResize = (event) => {
   <div class="flexibleContainer">
     <div class="answerContainer  clientAnswer" :question-number="answerArea.answers[0].questionNumber"
          :style="{height:answerContainerHeight+'px'}">
-      <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
+      <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}.</div>
     </div>
     <div class="drag-handle" draggable="true" @dragstart.stop="startResize" @drag.stop @dragend.stop="doResize"></div>
   </div>

@@ -52,11 +52,9 @@ router.beforeEach((to, from, next) => {
     } catch (e) {
         console.error(e)
     }
-
 });
 
 window.routerHistory = routerHistory;
-
 
 const app = createApp(App)
 app.use(ElementPlus)

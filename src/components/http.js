@@ -1,6 +1,7 @@
 import axios from 'axios';
 import userState from "@/userState.js";
 import router from "@/main.js";
+import {ElMessage} from "element-plus";
 
 const http = axios.create({
     baseURL: 'http://localhost:8080',
@@ -22,18 +23,42 @@ http.interceptors.request.use(function (config) {
 })
 
 
-http.interceptors.response.use(response => response, error => {
+http.interceptors.response.use(response => response, async error => {
     if (error.response && error.response.status === 401) {
         console.error('401 status')
         userState.value.ifLogin = false;
         router.push('/login')
     } else if (error.response && error.response.status === 403) {
         console.error('403 status')
-        router.push('/')
+        let backStep = 0;
+        let lastPath
+        let goHome = false;
+        do {
+            backStep++
+            if (routerHistory.length - backStep >= 0) {
+                lastPath = routerHistory[routerHistory.length - backStep]
+            } else {
+                goHome = true;
+                break;
+            }
+        } while (lastPath === '/login' || lastPath === '/register')
+        if (goHome) {
+            router.push('/')
+        } else {
+            router.go(-backStep)
+        }
+
+        ElMessage.error({
+            offset: 100,
+            message: '抱歉，您没有权限访问该资源.'
+        })
+
     } else if (error.code === "ERR_NETWORK") {
         console.error('网络问题')
-        //todo 网络问题页面
-        router.push('/')
+        ElMessage.error({
+            offset: 100,
+            message: '抱歉，我们无法连接到服务器，请检查您的网络连接.'
+        })
     } else {
         console.log(error)
         return Promise.reject(error)

@@ -51,7 +51,7 @@ onMounted(() => {
   <AnswerAreaTitle :title-ctx="answerArea.title" :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="answerContainer">
     <div v-for="answer in answerArea.answers" class="subQuestion">
-      <div class="questionNumber" style="font-size: 30px">{{ answer.questionNumber }}</div>
+      <div class="questionNumber" style="font-size: 30px">{{ answer.questionNumber }}.</div>
       <div class="clientAnswer" style="border-bottom: 1px solid black"
            :style="clientAnswerStyle" :question-number="answer.questionNumber"></div>
     </div>

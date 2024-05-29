@@ -50,9 +50,6 @@ async function downloadPDF() {
   }
 }
 
-function getCoordinate() {
-
-}
 
 function clickDownload() {
   //计量各个组件的坐标并commit

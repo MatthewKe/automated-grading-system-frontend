@@ -28,7 +28,7 @@ function endDrag(event) {
     <span class="material-symbols-outlined">
     calculate
     </span>
-    计算题
+    数学题
   </div>
 </template>
 

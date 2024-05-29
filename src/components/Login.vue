@@ -53,15 +53,21 @@ async function handleLogin() {
     userState.value.ifLogin = true
     let backStep = 0;
     let lastPath
+    let goHome = false;
     do {
       backStep++
       if (routerHistory.length - backStep >= 0) {
         lastPath = routerHistory[routerHistory.length - backStep]
       } else {
-        await router.push('/')
+        goHome = true;
+        break;
       }
     } while (lastPath === '/login' || lastPath === '/register')
-    router.go(-backStep + 1)
+    if (goHome) {
+      router.push('/')
+    } else {
+      router.go(-backStep + 1)
+    }
   } catch (error) {
     console.error('Login failed:', error.response);
     ElMessage.error({

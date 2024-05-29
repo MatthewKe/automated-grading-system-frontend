@@ -50,7 +50,7 @@ const lineAnswerStyle = {
                    :answer-area-index="answerAreaIndex"></AnswerAreaTitle>
   <div class="answerContainer clientAnswer" :question-number="answerArea.answers[0].questionNumber">
     <div style="display: flex;width: 100%;align-items: flex-end">
-      <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}</div>
+      <div class="questionNumber" style="font-size: 30px">{{ answerArea.answers[0].questionNumber }}.</div>
       <div class="lineAnswer" style="border-bottom: 1px solid black;width: 100%"
            :style="lineAnswerStyle"></div>
     </div>

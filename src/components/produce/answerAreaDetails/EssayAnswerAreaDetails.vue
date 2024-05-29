@@ -1,13 +1,36 @@
 <script setup>
 
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {getAnswerArea4AnswerAreaDetails} from "@/components/detailsOfProduce.js";
+import {Upload} from "@element-plus/icons-vue";
+import http from "@/components/http.js";
 
 const ifAutomated = ref(true)
 const answerArea = computed(() => getAnswerArea4AnswerAreaDetails())
 
 
 const tableRef = ref(null)
+
+
+const files = ref([])
+const fileInputButton = ref(null)
+
+function fileInput(event) {
+  files.value = event.target.files;
+}
+
+function handleFileUpload() {
+  fileInputButton.value.value = ''
+  fileInputButton.value.click()
+}
+
+watch(files, () => {
+  if (files.value.length === 0) {
+    return
+  }
+
+  files.value = [];
+}, {immediate: false, deep: true})
 
 </script>
 
@@ -23,8 +46,16 @@ const tableRef = ref(null)
       <el-input-number v-model="answerArea.answers[0].numOfLines" size="small" style="width: 100px"></el-input-number>
     </div>
 
-    <h3>正确答案</h3>
-    <el-input v-model="answerArea.answers[0].correctAnswer" size="small"></el-input>
+
+    <div style="display: flex;justify-content: center;width: 100%">
+
+      <input type="file" ref="fileInputButton" @input="fileInput" multiple style="display: none;">
+
+      <el-button style="width: 90%" @click="handleFileUpload">
+        上传范文
+      </el-button>
+    </div>
+
     <el-divider/>
     <h2>答题区域尺寸</h2>
     <div>
